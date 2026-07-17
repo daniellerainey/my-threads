@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DMC Thread Tracker</title>
+    <!-- This library handles the camera scanning -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        h2 { color: #333; text-align: center; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .stats { background: white; padding: 15px; border-radius: 10px; margin: 20px 0; display: flex; justify-content: space-around; font-weight: bold; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+        button { padding: 12px 20px; border: none; border-radius: 8px; background: #007bff; color: white; font-weight: bold; }
+        .thread-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .owned { border-left: 8px solid #28a745; }
+        .missing { border-left: 8px solid #dc3545; }
+        .btn-status { background: #6c757d; font-size: 12px; }
+        .btn-del { background: #ff4d4d; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>🧵 My DMC Tracker</h2>
+
+    <div id="reader"></div>
+
+    <div class="stats">
+        <div>Total Scanned: <span id="total-count">0</span></div>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="manual-entry" placeholder="Barcode or Color #">
+        <button onclick="addThread(document.getElementById('manual-entry').value)">Add</button>
+    </div>
+
+    <div id="thread-list"></div>
+
+    <script>
+        let inventory = JSON.parse(localStorage.getItem('dmc_data')) || {};
+
+        function updateUI() {
+            const list = document.getElementById('thread-list');
+            list.innerHTML = '';
+            const keys = Object.keys(inventory).reverse();
+            document.getElementById('total-count').innerText = keys.length;
+
+            keys.forEach(id => {
+                const item = inventory[id];
+                const div = document.createElement('div');
+                div.className = `thread-card ${item.status}`;
+                div.innerHTML = `
+                    <div>
+                        <strong>${id}</strong><br>
+                        <small>${item.status.toUpperCase()}</small>
+                    </div>
+                    <div>
+                        <button class="btn-status" onclick="toggleStatus('${id}')">Toggle Status</button>
+                        <button class="btn-del" onclick="deleteItem('${id}')">X</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            localStorage.setItem('dmc_data', JSON.stringify(inventory));
+        }
+
+        function addThread(id) {
+            if (!id) return;
+            if (!inventory[id]) {
+                inventory[id] = { status: 'owned' };
+            }
+            updateUI();
+            document.getElementById('manual-entry').value = '';
+        }
+
+        function toggleStatus(id) {
+            inventory[id].status = inventory[id].status === 'owned' ? 'missing' : 'owned';
+            updateUI();
+        }
+
+        function deleteItem(id) {
+            if(confirm('Delete this entry?')) {
+                delete inventory[id];
+                updateUI();
+            }
+        }
+
+        // Scanner setup
+        const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        scanner.render((text) => {
+            addThread(text);
+            // Vibrate phone when scanned
+            if (navigator.vibrate) navigator.vibrate(100);
+        });
+
+        updateUI();
+    </script>
+</body>
+</html>
