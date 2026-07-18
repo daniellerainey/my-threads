@@ -3,103 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DMC Color Tracker</title>
+    <title>DMC Tracker</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.png">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        :root { --dmc-purple: #120324; }
-        body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding-bottom: 100px; }
-        header { background: var(--dmc-purple); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
-        #reader { width: 100%; max-width: 400px; margin: 10px auto; border-radius: 12px; overflow: hidden; background: white; }
-        .controls { padding: 15px; position: sticky; top: 60px; background: #f5f5f5; z-index: 90; }
-        .search-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; box-sizing: border-box; }
-        .list-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; padding: 15px; }
+        :root { --dmc-purple: #4a148c; }
+        body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding-bottom: 120px; }
+        
+        header { 
+            background: var(--dmc-purple); color: white; padding: 20px 15px; 
+            text-align: center; position: sticky; top: 0; z-index: 100;
+        }
+
+        /* Search area is now more prominent at the top */
+        .controls { 
+            padding: 15px; background: #f5f5f5; position: sticky; top: 65px; z-index: 90;
+        }
+        .search-box { 
+            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; 
+            font-size: 18px; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .list-container { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); 
+            gap: 12px; padding: 15px; 
+        }
         
         .color-card { 
-            aspect-ratio: 1 / 1; border-radius: 10px; display: flex; flex-direction: column; 
+            aspect-ratio: 1 / 1; border-radius: 12px; display: flex; 
             justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative; cursor: pointer; border: 3px solid transparent; transition: transform 0.1s;
+            position: relative; cursor: pointer; border: 4px solid transparent;
         }
-        .color-card:active { transform: scale(0.95); }
-        .color-card.owned { border-color: #2e7d32; box-shadow: 0 0 10px rgba(46, 125, 50, 0.4); }
-        .color-card.owned::after { content: "✓"; position: absolute; top: 2px; right: 6px; font-weight: bold; font-size: 16px; }
-        .color-num { font-size: 18px; font-weight: 800; }
+        .color-card.owned { border-color: #2e7d32; }
+        .color-card.owned::after { 
+            content: "✓"; position: absolute; top: 2px; right: 6px; font-weight: bold; font-size: 18px; 
+        }
+        .color-num { font-size: 20px; font-weight: 800; }
 
-        .stats-bar { 
+        /* Scanner is hidden by default */
+        #scanner-container {
+            display: none; position: fixed; bottom: 80px; left: 5%; width: 90%;
+            background: white; z-index: 200; border-radius: 20px; padding: 10px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+        }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; }
+
+        .footer-bar { 
             position: fixed; bottom: 0; width: 100%; background: white; 
-            padding: 15px; border-top: 1px solid #ddd; display: flex; 
+            padding: 15px 0; border-top: 1px solid #ddd; display: flex; 
             justify-content: space-around; align-items: center; z-index: 100;
         }
-        .filter-btn { background: var(--dmc-purple); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; }
+        
+        .nav-btn { 
+            background: none; border: none; color: #666; font-size: 12px; 
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .nav-btn.active { color: var(--dmc-purple); font-weight: bold; }
+        .scan-trigger {
+            background: var(--dmc-purple); color: white; width: 60px; height: 60px;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            margin-top: -35px; box-shadow: 0 4px 10px rgba(74, 20, 140, 0.4); border: 4px solid white;
+        }
     </style>
 </head>
 <body>
 
 <header><h2 style="margin:0">DMC Master Tracker</h2></header>
 
-<div id="reader"></div>
-
 <div class="controls">
-    <input type="text" id="searchInput" class="search-box" placeholder="Search color # (e.g. 310)" oninput="renderList()">
+    <input type="text" id="searchInput" class="search-box" placeholder="Search color #..." oninput="renderList()">
 </div>
 
 <div id="masterList" class="list-container"></div>
 
-<div class="stats-bar">
-    <b>Owned: <span id="ownedCount">0</span></b>
-    <button class="filter-btn" onclick="toggleFilter()" id="filterBtn">Show Owned Only</button>
+<!-- Scanner Popup -->
+<div id="scanner-container">
+    <div id="reader"></div>
+    <button onclick="toggleScanner()" style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee; border-radius:10px;">Close Scanner</button>
+</div>
+
+<div class="footer-bar">
+    <button class="nav-btn" onclick="filterOwned(false)" id="allBtn">
+        <span style="font-size:20px">📚</span>All
+    </button>
+    
+    <button class="scan-trigger" onclick="toggleScanner()">
+        <span style="font-size:24px">📷</span>
+    </button>
+    
+    <button class="nav-btn" onclick="filterOwned(true)" id="ownedBtn">
+        <span style="font-size:20px">✅</span>Owned (<span id="ownedCount">0</span>)
+    </button>
 </div>
 
 <script>
-    // SOURCE OF TRUTH: Only active, non-discontinued colors from the Lord Libidan Master List
-    const dmcData = {
-        "01":"#f2f2f0","02":"#dbe4e0","03":"#c6ccc8","04":"#9ea39f","05":"#848985","06":"#727773","07":"#eff1ef","08":"#e4e5e4","09":"#d1d3d1","10":"#bebebe","11":"#9a9a9a","12":"#848484","13":"#f1ecf3","14":"#e6dbe9","15":"#d8c1e0","16":"#c1a1cd","17":"#ae82b9","18":"#9964a4","19":"#fff9ef","20":"#fff3d5","21":"#ffe9ac","22":"#fee081","23":"#dfaf5a","24":"#ffffff","25":"#e3e1e1","26":"#fceef0","27":"#f8d5db","28":"#f0aeb8","29":"#e47a8d","30":"#8d2d3d","31":"#73212e","32":"#4a141c","33":"#f3f6ec","34":"#e8eddb","35":"#d2d9b6","150":"#9d0631","151":"#f0a3b5","152":"#d18e8e","153":"#e6b8d2","154":"#531427","155":"#938ac3","156":"#a3abd4","157":"#bcc4e1","158":"#434c76","159":"#c6cbe0","160":"#98a1c3","161":"#7681a9","162":"#dae7f2","163":"#4d8266","164":"#c8e0d3","165":"#eff5a3","166":"#c5d44d","167":"#a68153","168":"#d1d1d1","169":"#848484","208":"#8359a3","209":"#a284ba","210":"#c1aecd","211":"#e1d5e7","221":"#90373d","223":"#cc847c","224":"#ebc1b7","225":"#f7e3db","300":"#702d00","301":"#b0590c","304":"#b71f33","307":"#ffed4d","309":"#d62b5b","310":"#000000","311":"#00426b","312":"#1c4e85","315":"#814952","316":"#b7737f","317":"#666666","318":"#bababa","319":"#1c402b","320":"#608c69","321":"#c72b3b","322":"#5a8cb5","326":"#b32f48","327":"#5c184e","333":"#5c5391","334":"#73a1c6","335":"#ee546e","336":"#213360","340":"#938ac3","341":"#bcc4e1","347":"#bf2d2d","349":"#d21035","350":"#e04848","351":"#e96a67","352":"#fd9c97","353":"#fed7cc","355":"#9b4941","356":"#d18e8e","367":"#32593b","368":"#a2c3a5","369":"#d5ebda","370":"#a68153","371":"#bc9c6a","372":"#ccb38c","400":"#8e3c0c","402":"#f4a176","407":"#bb846f","413":"#444444","414":"#8c8c8c","415":"#d4d4d4","420":"#936b3f","422":"#ccae8c","433":"#73492b","434":"#93603b","435":"#b37b4d","436":"#cb996a","437":"#e6bc93","444":"#ffd600","445":"#ffff9c","451":"#95817c","452":"#bcadaa","453":"#d8d1cf","469":"#5c6b2b","470":"#7b8c33","471":"#aeba5c","472":"#d4e39c","498":"#a7132b","500":"#003322","501":"#375344","502":"#739181","503":"#b0c6bb","505":"#338c66","517":"#337b93","518":"#4d9cb3","519":"#9ccbd4","520":"#495337","522":"#93a284","523":"#adbba2","524":"#cbd3c1","535":"#535349","543":"#e9dad2","550":"#4c004c","552":"#803380","553":"#a266a2","554":"#dbb7db","561":"#2e604d","562":"#4d8c73","563":"#93ccb7","564":"#b7dbcb","580":"#848c33","581":"#a2b33b","597":"#5993a2","598":"#b0d4db","600":"#cd2f63","601":"#d1286a","602":"#e24874","603":"#ff8cae","604":"#ffb0be","605":"#ffc0cd","606":"#ff3300","608":"#ff592b","610":"#7b6653","611":"#937b66","612":"#bcad93","613":"#d8ccb7","632":"#815949","640":"#848473","642":"#ada28c","644":"#dbd8cb","645":"#6c6c6c","646":"#848484","647":"#ada2a2","648":"#bcbcbc","666":"#e31d42","676":"#e6bc7b","677":"#f4ebc1","680":"#bc9333","699":"#00661c","700":"#007d3a","701":"#3b8c49","702":"#4db360","703":"#73cc84","704":"#93db3b","712":"#fcf8ec","718":"#9c2462","720":"#d4592b","721":"#fd814d","722":"#fdad8c","725":"#ffbc33","726":"#ffdb4d","727":"#fff3b0","728":"#e6a233","729":"#d19333","730":"#736b1c","731":"#847b2b","732":"#938c33","733":"#ada23b","734":"#bcad60","738":"#e6ccad","739":"#f8ecdb","740":"#ff8100","741":"#ff9c21","742":"#ffbc4d","743":"#ffd44f","744":"#ffe381","745":"#fff1ad","746":"#fcfcf0","747":"#e6fcfc","754":"#f7cfbc","758":"#eeaa93","760":"#f5adad","761":"#ffc9c9","762":"#ececec","772":"#e3ebcb","775":"#daebf2","776":"#ffb0be","777":"#913546","778":"#d1a2ac","779":"#534044","780":"#93591c","781":"#a26621","782":"#b37b2b","783":"#cb9c33","791":"#2e3359","792":"#536093","793":"#7b8cb7","794":"#a2b7d8","796":"#003f80","797":"#11539c","798":"#4373a9","799":"#7ba2cb","800":"#b0cbe6","801":"#66402b","803":"#2b4d73","806":"#3b8c9c","807":"#60a2b0","809":"#93aed1","813":"#66a2cb","814":"#7b001b","815":"#87071f","816":"#970b23","817":"#bb051f","818":"#ffdfd9","819":"#ffeeeb","820":"#0e1e40","822":"#ede4d5","823":"#0e1633","824":"#2b6084","825":"#437b9c","826":"#6093b7","827":"#b7dbf0","828":"#d5eff8","829":"#7b663b","830":"#8c7344","831":"#a28c53","832":"#bc9c3b","833":"#ccae60","834":"#dbbc84","838":"#594437","839":"#665344","840":"#8c7360","841":"#ada28c","842":"#d1c1ad","844":"#494949","869":"#8c7344","890":"#003311","891":"#ff5773","892":"#ff798c","893":"#fc90a2","894":"#ffb2bb","895":"#2e491c","898":"#533721","899":"#f27688","900":"#d44900","902":"#822637","904":"#497b1c","905":"#609321","906":"#81bc33","907":"#9ccb3b","909":"#116b44","910":"#1c8153","911":"#2e9c66","912":"#4db784","913":"#93ccb0","915":"#820043","917":"#9b1359","918":"#8c3b1c","919":"#a24921","920":"#b35933","921":"#cb6c3b","922":"#e0844d","924":"#445960","926":"#93ada2","927":"#b7cbc1","928":"#e1ebe6","930":"#445366","931":"#667b93","932":"#a2b7cb","934":"#333b21","935":"#44492b","936":"#4d5321","937":"#60732b","938":"#372111","939":"#0e112b","943":"#3b9c8c","945":"#fbdbc6","946":"#ff6000","947":"#ff733b","948":"#fee3d5","950":"#ebccbc","951":"#fbe3d2","954":"#b7dbb0","955":"#dbf0da","956":"#ff9191","957":"#fdb5b5","958":"#3bc1ab","959":"#59dbcb","961":"#cf7373","962":"#e68a8a","963":"#ffd7d7","964":"#adebeb","966":"#b7cbac","967":"#fbadb4","970":"#ff931c","972":"#ffbc00","973":"#ffed00","975":"#8c4d1c","976":"#cb8c44","977":"#e6ae66","986":"#374d2b","987":"#597b4d","988":"#7bac73","989":"#93bc84","991":"#498c73","992":"#73b39c","993":"#a2ccbc","995":"#00a2e2","996":"#33ccff","3011":"#8c8c59","3012":"#a2a266","3013":"#bcbca2","3021":"#49443b","3022":"#8c8c81","3023":"#ada293","3024":"#e6e3df","3031":"#443b33","3032":"#b0a293","3033":"#dbd5cb","3041":"#956f7c","3042":"#b79da7","3045":"#bc9c6a","3046":"#dbcc93","3047":"#ede3c1","3051":"#59603b","3052":"#8c936c","3053":"#ada281","3064":"#bc8c73","3072":"#dbdbdb","3078":"#fcf8c1","3325":"#b0cae4","3326":"#fbadb4","3328":"#e36d6d","3340":"#ff8460","3341":"#f27688","3345":"#44592b","3346":"#60813b","3347":"#739c4d","3348":"#bcce8c","3350":"#bc4365","3354":"#da8193","3362":"#5e6c41","3363":"#738453","3364":"#a6b384","3371":"#1e140e","3607":"#e172a1","3608":"#e69fbd","3609":"#f2bed2","3685":"#850b2b","3687":"#c26880","3688":"#e9a3b8","3689":"#fcd7e1","3705":"#ff7992","3706":"#ffadbc","3708":"#ffcbd5","3712":"#f18787","3713":"#ffe2e2","3716":"#ffbdbd","3721":"#a14b51","3722":"#bc6c64","3726":"#956f7c","3727":"#dba9b2","3731":"#da6783","3733":"#e8879b","3740":"#785762","3743":"#d7cbd3","3746":"#72375d","3747":"#d2daee","3750":"#374459","3752":"#bccbda","3753":"#dbe3eb","3755":"#93aecb","3756":"#eef4f8","3760":"#5993bc","3761":"#cbe3eb","3765":"#005973","3766":"#93ccdb","3768":"#667b84","3770":"#feedda","3771":"#eda384","3772":"#a26653","3774":"#f4e3d5","3776":"#cb8153","3777":"#93372b","3778":"#d48473","3779":"#fbad9c","3781":"#665344","3782":"#bcad93","3787":"#605953","3790":"#847366","3799":"#444444","3801":"#e74967","3802":"#714149","3803":"#9b1359","3804":"#e24874","3805":"#d1286a","3806":"#ff8cae","3807":"#5c5391","3808":"#004d60","3809":"#3b8193","3810":"#73b3c1","3811":"#bce6eb","3812":"#009384","3813":"#b7dbcb","3814":"#4daba2","3815":"#608c7b","3816":"#93bcad","3817":"#b7dbcb","3818":"#006644","3819":"#e3eb7b","3820":"#dfaf5a","3821":"#f0c66c","3822":"#f7d68a","3823":"#fff9e3","3824":"#fecbb7","3825":"#fdb38c","3826":"#b77b4d","3827":"#f4bc8c","3828":"#bc9c73","3829":"#bc9333","3830":"#bc594d","3831":"#b32f48","3832":"#db556e","3833":"#ea8699","3834":"#72375d","3835":"#946083","3836":"#ba91aa","3837":"#946083","3838":"#7ba2cb","3839":"#93aed1","3840":"#b0cbe6","3841":"#daebf2","3842":"#2b6084","3843":"#00a2e2","3844":"#33ccff","3845":"#00bcc1","3846":"#00e6eb","3847":"#00816b","3848":"#009ca6","3849":"#4dbaba","3850":"#009381","3851":"#3bc1ab","3852":"#f0c66c","3853":"#f4a159","3854":"#fdb38c","3855":"#fedba2","3856":"#fedecc","3857":"#602b21","3858":"#935349","3859":"#bc8c84","3860":"#7b6060","3861":"#ada2a2","3862":"#8c7360","3863":"#ada28c","3864":"#d1c1ad","3865":"#fcf8f0","3866":"#f4f1eb","Blanc":"#ffffff","Ecru":"#f0ead6","B5200":"#ffffff"
-    };
+    // [The large dmcData object from the previous message goes here - keeping it exactly the same]
+    const dmcData = { "01":"#f2f2f0","02":"#dbe4e0","03":"#c6ccc8","04":"#9ea39f","05":"#848985","06":"#727773","07":"#eff1ef","08":"#e4e5e4","09":"#d1d3d1","10":"#bebebe","11":"#9a9a9a","12":"#848484","13":"#f1ecf3","14":"#e6dbe9","15":"#d8c1e0","16":"#c1a1cd","17":"#ae82b9","18":"#9964a4","19":"#fff9ef","20":"#fff3d5","21":"#ffe9ac","22":"#fee081","23":"#dfaf5a","24":"#ffffff","25":"#e3e1e1","26":"#fceef0","27":"#f8d5db","28":"#f0aeb8","29":"#e47a8d","30":"#8d2d3d","31":"#73212e","32":"#4a141c","33":"#f3f6ec","34":"#e8eddb","35":"#d2d9b6","150":"#9d0631","151":"#f0a3b5","152":"#d18e8e","153":"#e6b8d2","154":"#531427","155":"#938ac3","156":"#a3abd4","157":"#bcc4e1","158":"#434c76","159":"#c6cbe0","160":"#98a1c3","161":"#7681a9","162":"#dae7f2","163":"#4d8266","164":"#c8e0d3","165":"#eff5a3","166":"#c5d44d","167":"#a68153","168":"#d1d1d1","169":"#848484","208":"#8359a3","209":"#a284ba","210":"#c1aecd","211":"#e1d5e7","221":"#90373d","223":"#cc847c","224":"#ebc1b7","225":"#f7e3db","300":"#702d00","301":"#b0590c","304":"#b71f33","307":"#ffed4d","309":"#d62b5b","310":"#000000","311":"#00426b","312":"#1c4e85","315":"#814952","316":"#b7737f","317":"#666666","318":"#bababa","319":"#1c402b","320":"#608c69","321":"#c72b3b","322":"#5a8cb5","326":"#b32f48","327":"#5c184e","333":"#5c5391","334":"#73a1c6","335":"#ee546e","336":"#213360","340":"#938ac3","341":"#bcc4e1","347":"#bf2d2d","349":"#d21035","350":"#e04848","351":"#e96a67","352":"#fd9c97","353":"#fed7cc","355":"#9b4941","356":"#d18e8e","367":"#32593b","368":"#a2c3a5","369":"#d5ebda","370":"#a68153","371":"#bc9c6a","372":"#ccb38c","400":"#8e3c0c","402":"#f4a176","407":"#bb846f","413":"#444444","414":"#8c8c8c","415":"#d4d4d4","420":"#936b3f","422":"#ccae8c","433":"#73492b","434":"#93603b","435":"#b37b4d","436":"#cb996a","437":"#e6bc93","444":"#ffd600","445":"#ffff9c","451":"#95817c","452":"#bcadaa","453":"#d8d1cf","469":"#5c6b2b","470":"#7b8c33","471":"#aeba5c","472":"#d4e39c","498":"#a7132b","500":"#003322","501":"#375344","502":"#739181","503":"#b0c6bb","505":"#338c66","517":"#337b93","518":"#4d9cb3","519":"#9ccbd4","520":"#495337","522":"#93a284","523":"#adbba2","524":"#cbd3c1","535":"#535349","543":"#e9dad2","550":"#4c004c","552":"#803380","553":"#a266a2","554":"#dbb7db","561":"#2e604d","562":"#4d8c73","563":"#93ccb7","564":"#b7dbcb","580":"#848c33","581":"#a2b33b","597":"#5993a2","598":"#b0d4db","600":"#cd2f63","601":"#d1286a","602":"#e24874","603":"#ff8cae","604":"#ffb0be","605":"#ffc0cd","606":"#ff3300","608":"#ff592b","610":"#7b6653","611":"#937b66","612":"#bcad93","613":"#d8ccb7","632":"#815949","640":"#848473","642":"#ada28c","644":"#dbd8cb","645":"#6c6c6c","646":"#848484","647":"#ada2a2","648":"#bcbcbc","666":"#e31d42","676":"#e6bc7b","677":"#f4ebc1","680":"#bc9333","699":"#00661c","700":"#007d3a","701":"#3b8c49","702":"#4db360","703":"#73cc84","704":"#93db3b","712":"#fcf8ec","718":"#9c2462","720":"#d4592b","721":"#fd814d","722":"#fdad8c","725":"#ffbc33","726":"#ffdb4d","727":"#fff3b0","728":"#e6a233","729":"#d19333","730":"#736b1c","731":"#847b2b","732":"#938c33","733":"#ada23b","734":"#bcad60","738":"#e6ccad","739":"#f8ecdb","740":"#ff8100","741":"#ff9c21","742":"#ffbc4d","743":"#ffd44f","744":"#ffe381","745":"#fff1ad","746":"#fcfcf0","747":"#e6fcfc","754":"#f7cfbc","758":"#eeaa93","760":"#f5adad","761":"#ffc9c9","762":"#ececec","772":"#e3ebcb","775":"#daebf2","776":"#ffb0be","777":"#913546","778":"#d1a2ac","779":"#534044","780":"#93591c","781":"#a26621","782":"#b37b2b","783":"#cb9c33","791":"#2e3359","792":"#536093","793":"#7b8cb7","794":"#a2b7d8","796":"#003f80","797":"#11539c","798":"#4373a9","799":"#7ba2cb","800":"#b0cbe6","801":"#66402b","803":"#2b4d73","806":"#3b8c9c","807":"#60a2b0","809":"#93aed1","813":"#66a2cb","814":"#7b001b","815":"#87071f","816":"#970b23","817":"#bb051f","818":"#ffdfd9","819":"#ffeeeb","820":"#0e1e40","822":"#ede4d5","823":"#0e1633","824":"#2b6084","825":"#437b9c","826":"#6093b7","827":"#b7dbf0","828":"#d5eff8","829":"#7b663b","830":"#8c7344","831":"#a28c53","832":"#bc9c3b","833":"#ccae60","834":"#dbbc84","838":"#594437","839":"#665344","840":"#8c7360","841":"#ada28c","842":"#d1c1ad","844":"#494949","869":"#8c7344","890":"#003311","891":"#ff5773","892":"#ff798c","893":"#fc90a2","894":"#ffb2bb","895":"#2e491c","898":"#533721","899":"#f27688","900":"#d44900","902":"#822637","904":"#497b1c","905":"#609321","906":"#81bc33","907":"#9ccb3b","909":"#116b44","910":"#1c8153","911":"#2e9c66","912":"#4db784","913":"#93ccb0","915":"#820043","917":"#9b1359","918":"#8c3b1c","919":"#a24921","920":"#b35933","921":"#cb6c3b","922":"#e0844d","924":"#445960","926":"#93ada2","927":"#b7cbc1","928":"#e1ebe6","930":"#445366","931":"#667b93","932":"#a2b7cb","934":"#333b21","935":"#44492b","936":"#4d5321","937":"#60732b","938":"#372111","939":"#0e112b","943":"#3b9c8c","945":"#fbdbc6","946":"#ff6000","947":"#ff733b","948":"#fee3d5","950":"#ebccbc","951":"#fbe3d2","954":"#b7dbb0","955":"#dbf0da","956":"#ff9191","957":"#fdb5b5","958":"#3bc1ab","959":"#59dbcb","961":"#cf7373","962":"#e68a8a","963":"#ffd7d7","964":"#adebeb","966":"#b7cbac","967":"#fbadb4","970":"#ff931c","972":"#ffbc00","973":"#ffed00","975":"#8c4d1c","976":"#cb8c44","977":"#e6ae66","986":"#374d2b","987":"#597b4d","988":"#7bac73","989":"#93bc84","991":"#498c73","992":"#73b39c","993":"#a2ccbc","995":"#00a2e2","996":"#33ccff","3011":"#8c8c59","3012":"#a2a266","3013":"#bcbca2","3021":"#49443b","3022":"#8c8c81","3023":"#ada293","3024":"#e6e3df","3031":"#443b33","3032":"#b0a293","3033":"#dbd5cb","3041":"#956f7c","3042":"#b79da7","3045":"#bc9c6a","3046":"#dbcc93","3047":"#ede3c1","3051":"#59603b","3052":"#8c936c","3053":"#ada281","3064":"#bc8c73","3072":"#dbdbdb","3078":"#fcf8c1","3325":"#b0cae4","3326":"#fbadb4","3328":"#e36d6d","3340":"#ff8460","3341":"#f27688","3345":"#44592b","3346":"#60813b","3347":"#739c4d","3348":"#bcce8c","3350":"#bc4365","3354":"#da8193","3362":"#5e6c41","3363":"#738453","3364":"#a6b384","3371":"#1e140e","3607":"#e172a1","3608":"#e69fbd","3609":"#f2bed2","3685":"#850b2b","3687":"#c26880","3688":"#e9a3b8","3689":"#fcd7e1","3705":"#ff7992","3706":"#ffadbc","3708":"#ffcbd5","3712":"#f18787","3713":"#ffe2e2","3716":"#ffbdbd","3721":"#a14b51","3722":"#bc6c64","3726":"#956f7c","3727":"#dba9b2","3731":"#da6783","3733":"#e8879b","3740":"#785762","3743":"#d7cbd3","3746":"#72375d","3747":"#d2daee","3750":"#374459","3752":"#bccbda","3753":"#dbe3eb","3755":"#93aecb","3756":"#eef4f8","3760":"#5993bc","3761":"#cbe3eb","3765":"#005973","3766":"#93ccdb","3768":"#667b84","3770":"#feedda","3771":"#eda384","3772":"#a26653","3774":"#f4e3d5","3776":"#cb8153","3777":"#93372b","3777":"#93372b","3778":"#d48473","3779":"#fbad9c","3781":"#665344","3782":"#bcad93","3787":"#605953","3790":"#847366","3799":"#444444","3801":"#e74967","3802":"#714149","3803":"#9b1359","3804":"#e24874","3805":"#d1286a","3806":"#ff8cae","3807":"#5c5391","3808":"#004d60","3809":"#3b8193","3810":"#73b3c1","3811":"#bce6eb","3812":"#009384","3813":"#b7dbcb","3814":"#4daba2","3815":"#608c7b","3816":"#93bcad","3817":"#b7dbcb","3818":"#006644","3819":"#e3eb7b","3820":"#dfaf5a","3821":"#f0c66c","3822":"#f7d68a","3823":"#fff9e3","3824":"#fecbb7","3825":"#fdb38c","3826":"#b77b4d","3827":"#f4bc8c","3828":"#bc9c73","3829":"#bc9333","3830":"#bc594d","3831":"#b32f48","3832":"#db556e","3833":"#ea8699","3834":"#72375d","3835":"#946083","3836":"#ba91aa","3837":"#946083","3838":"#7ba2cb","3839":"#93aed1","3840":"#b0cbe6","3841":"#daebf2","3842":"#2b6084","3843":"#00a2e2","3844":"#33ccff","3845":"#00bcc1","3846":"#00e6eb","3847":"#00816b","3848":"#009ca6","3849":"#4dbaba","3850":"#009381","3851":"#3bc1ab","3852":"#f0c66c","3853":"#f4a159","3854":"#fdb38c","3855":"#fedba2","3856":"#fedecc","3857":"#602b21","3858":"#935349","3859":"#bc8c84","3860":"#7b6060","3861":"#ada2a2","3862":"#8c7360","3863":"#ada28c","3864":"#d1c1ad","3865":"#fcf8f0","3866":"#f4f1eb","Blanc":"#ffffff","Ecru":"#f0ead6","B5200":"#ffffff" };
 
-    // Helper: Sort function for DMC codes (Numeric first, then Strings like Blanc/Ecru)
     const sortedKeys = Object.keys(dmcData).sort((a, b) => {
-        const isANum = !isNaN(a);
-        const isBNum = !isNaN(b);
+        const isANum = !isNaN(a); const isBNum = !isNaN(b);
         if (isANum && isBNum) return parseInt(a) - parseInt(b);
-        if (isANum) return -1;
-        if (isBNum) return 1;
+        if (isANum) return -1; if (isBNum) return 1;
         return a.localeCompare(b);
     });
 
     let myInventory = JSON.parse(localStorage.getItem('dmc_owned_v4')) || {};
     let barcodeMap = JSON.parse(localStorage.getItem('dmc_barcodes_v4')) || {"077540050727":"208"};
     let onlyShowOwned = false;
+    let scannerActive = false;
+    let html5QrcodeScanner = null;
 
     function getContrastColor(hex) {
-        if(!hex || hex === "#ccc") return "black";
         const r = parseInt(hex.substr(1,2),16);
         const g = parseInt(hex.substr(3,2),16);
         const b = parseInt(hex.substr(5,2),16);
-        const yiq = ((r*299)+(g*587)+(b*114))/1000;
-        return (yiq >= 128) ? 'black' : 'white';
+        return (((r*299)+(g*587)+(b*114))/1000 >= 128) ? 'black' : 'white';
     }
 
     function renderList() {
         const query = document.getElementById('searchInput').value.toLowerCase();
         const container = document.getElementById('masterList');
         container.innerHTML = '';
-        
         let count = 0;
+        
         sortedKeys.forEach(num => {
             const isOwned = myInventory[num];
             if (onlyShowOwned && !isOwned) return;
             if (query && !num.toLowerCase().includes(query)) return;
 
             const hex = dmcData[num];
-            const textColor = getContrastColor(hex);
-
             const card = document.createElement('div');
             card.className = `color-card ${isOwned ? 'owned' : ''}`;
             card.style.backgroundColor = hex;
-            card.style.color = textColor;
+            card.style.color = getContrastColor(hex);
             card.onclick = () => toggleOwned(num);
             card.innerHTML = `<span class="color-num">${num}</span>`;
-            
             container.appendChild(card);
             if(isOwned) count++;
         });
@@ -113,36 +152,44 @@
         renderList();
     }
 
-    function toggleFilter() {
-        onlyShowOwned = !onlyShowOwned;
-        document.getElementById('filterBtn').innerText = onlyShowOwned ? "Show All Colors" : "Show Owned Only";
+    function filterOwned(val) {
+        onlyShowOwned = val;
+        document.getElementById('allBtn').classList.toggle('active', !val);
+        document.getElementById('ownedBtn').classList.toggle('active', val);
         renderList();
     }
 
-    const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 200 });
-    scanner.render((barcode) => {
-        let colorNum = barcodeMap[barcode];
-        if (!colorNum) {
-            colorNum = prompt(`New Barcode: ${barcode}\nWhat DMC #?`);
-            if (colorNum) {
-                colorNum = colorNum.replace('*', '').trim();
-                barcodeMap[barcode] = colorNum; 
-                localStorage.setItem('dmc_barcodes_v4', JSON.stringify(barcodeMap)); 
-            }
+    function toggleScanner() {
+        const container = document.getElementById('scanner-container');
+        scannerActive = !scannerActive;
+        container.style.display = scannerActive ? 'block' : 'none';
+        
+        if (scannerActive) {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 200 });
+            html5QrcodeScanner.render((barcode) => {
+                let colorNum = barcodeMap[barcode];
+                if (!colorNum) {
+                    colorNum = prompt(`New Barcode: ${barcode}\nWhat DMC #?`);
+                    if (colorNum) {
+                        colorNum = colorNum.replace('*','').trim();
+                        barcodeMap[barcode] = colorNum;
+                        localStorage.setItem('dmc_barcodes_v4', JSON.stringify(barcodeMap));
+                    }
+                }
+                if (colorNum && dmcData[colorNum]) {
+                    myInventory[colorNum] = true;
+                    localStorage.setItem('dmc_owned_v4', JSON.stringify(myInventory));
+                    renderList();
+                    if (navigator.vibrate) navigator.vibrate(100);
+                }
+            });
+        } else if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
         }
-        if (colorNum && dmcData[colorNum]) {
-            myInventory[colorNum] = true;
-            localStorage.setItem('dmc_owned_v4', JSON.stringify(myInventory));
-            renderList();
-            if (navigator.vibrate) navigator.vibrate(100);
-        }
-    });
+    }
 
     renderList();
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 </script>
 </body>
 </html>
