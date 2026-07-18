@@ -6,25 +6,20 @@
     <title>DMC Tracker</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png">
-    <meta name="theme-color" content="#120324">
+    <meta name="theme-color" content="#232227">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root { --dmc-purple: #120324; }
-        body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding-bottom: 120px; }
+        body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding-bottom: 140px; }
         
         header { 
-            background: var(--dmc-purple); color: white; padding: 25px 15px; 
+            background: var(--dmc-purple); color: white; padding: 30px 15px; 
             text-align: center; position: sticky; top: 0; z-index: 100;
         }
         
-        /* 40% Larger Header Text */
-        header h2 { 
-            margin: 0; 
-            font-size: 2.2rem; /* Scaled up from standard */
-            letter-spacing: 1px;
-        }
+        header h2 { margin: 0; font-size: 2.2rem; letter-spacing: 1px; }
 
-        .controls { padding: 15px; background: #f5f5f5; position: sticky; top: 90px; z-index: 90; }
+        .controls { padding: 15px; background: #f5f5f5; position: sticky; top: 95px; z-index: 90; }
         .search-box { 
             width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; 
             font-size: 18px; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -42,21 +37,11 @@
             transition: transform 0.1s, border-color 0.2s;
         }
 
-        /* Black Highlight for selected cards */
-        .color-card.owned { 
-            border-color: #000000; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+        .color-card.owned { border-color: #000000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         
         .color-card.owned::after { 
-            content: "✓"; 
-            position: absolute; 
-            top: 2px; 
-            right: 6px; 
-            font-weight: bold; 
-            font-size: 22px;
-            color: #000000;
-            /* White shadow ensures the black check is visible on dark threads */
+            content: "✓"; position: absolute; top: 2px; right: 6px; font-weight: bold; 
+            font-size: 22px; color: #000000;
             text-shadow: 0 0 4px rgba(255, 255, 255, 1), 0 0 2px rgba(255, 255, 255, 1);
             z-index: 2;
         }
@@ -64,28 +49,34 @@
         .color-num { font-size: 20px; font-weight: 800; pointer-events: none; }
 
         #scanner-container {
-            display: none; position: fixed; bottom: 80px; left: 5%; width: 90%;
+            display: none; position: fixed; bottom: 100px; left: 5%; width: 90%;
             background: white; z-index: 200; border-radius: 20px; padding: 10px;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
         }
         #reader { width: 100%; border-radius: 15px; overflow: hidden; }
 
+        /* FOOTER IMPROVEMENTS */
         .footer-bar { 
             position: fixed; bottom: 0; width: 100%; background: white; 
-            padding: 15px 0; border-top: 1px solid #ddd; display: flex; 
+            height: 90px; border-top: 1px solid #ddd; display: flex; 
             justify-content: space-around; align-items: center; z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .nav-btn { 
-            background: none; border: none; color: #666; font-size: 12px; 
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            background: none; border: none; color: #888; font-size: 16px; 
+            font-weight: bold; padding: 10px; flex: 1;
         }
-        .nav-btn.active { color: var(--dmc-purple); font-weight: bold; }
+        .nav-btn.active { color: var(--dmc-purple); border-bottom: 3px solid var(--dmc-purple); }
+
+        /* BIGGER CAMERA BUTTON */
         .scan-trigger {
-            background: var(--dmc-purple); color: white; width: 60px; height: 60px;
+            background: var(--dmc-purple); color: white; width: 75px; height: 75px;
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            margin-top: -35px; box-shadow: 0 4px 10px rgba(18, 3, 36, 0.4); border: 4px solid white;
+            margin-top: -45px; box-shadow: 0 4px 15px rgba(18, 3, 36, 0.5); border: 5px solid white;
+            flex-shrink: 0;
         }
+        .scan-trigger svg { width: 35px; height: 35px; fill: currentColor; }
     </style>
 </head>
 <body>
@@ -100,19 +91,17 @@
 
 <div id="scanner-container">
     <div id="reader"></div>
-    <button onclick="toggleScanner()" style="width:100%; padding:12px; margin-top:10px; border:none; background:#f0f0f0; border-radius:10px; font-weight:bold;">Close Scanner</button>
+    <button onclick="toggleScanner()" style="width:100%; padding:15px; margin-top:10px; border:none; background:#f0f0f0; border-radius:10px; font-weight:bold; font-size:16px;">CLOSE SCANNER</button>
 </div>
 
 <div class="footer-bar">
-    <button class="nav-btn" onclick="filterOwned(false)" id="allBtn">
-        <span style="font-size:20px">📚</span>All
-    </button>
+    <button class="nav-btn active" onclick="filterOwned(false)" id="allBtn">ALL</button>
+    
     <button class="scan-trigger" onclick="toggleScanner()">
-        <span style="font-size:24px">📷</span>
+        <svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>
     </button>
-    <button class="nav-btn" onclick="filterOwned(true)" id="ownedBtn">
-        <span style="font-size:20px">✅</span>Owned (<span id="ownedCount">0</span>)
-    </button>
+    
+    <button class="nav-btn" onclick="filterOwned(true)" id="ownedBtn">OWNED (<span id="ownedCount">0</span>)</button>
 </div>
 
 <script>
