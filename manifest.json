@@ -3,8 +3,8 @@
   "short_name": "DMC Tracker",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#4a148c",
-  "theme_color": "#4a148c",
+  "background_color": "#120324",
+  "theme_color": "#120324",
   "icons": [
     {
       "src": "icon.png",
