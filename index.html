@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Strings V6.3</title>
+    <title>Strings V6.4</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png">
     <meta name="theme-color" content="#232227">
@@ -16,7 +16,7 @@
         
         body { font-family: -apple-system, sans-serif; background: var(--bg-gray); margin: 0; padding-bottom: 160px; touch-action: manipulation; }
         
-        header { background: var(--dmc-purple); color: white; padding: 30px 15px; text-align: center; position: sticky; top: 0; z-index: 200; }
+        header { background: var(--dmc-purple); color: white; padding: 35px 15px; text-align: center; position: sticky; top: 0; z-index: 200; }
         header h2 { margin: 0; font-size: 2.2rem; letter-spacing: 1px; }
 
         .view-section { display: none; padding: 15px; }
@@ -29,33 +29,38 @@
         .color-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; cursor: pointer; border: 4px solid transparent; transition: transform 0.1s; }
         .color-card:active { transform: scale(0.92); }
         .color-card.owned { border-color: #000; }
-        .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; }
+        .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .color-num { font-size: 20px; font-weight: 800; pointer-events: none; }
         .unknown-color { background-color: #A6A6A6; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px); }
 
-        /* PROJECTS LIST - NEW V6.3 HORIZONTAL LAYOUT */
-        .project-grid { display: flex; flex-direction: column; gap: 12px; }
+        .camera-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background: var(--dmc-purple); color: white; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(18, 3, 36, 0.1); grid-column: -1; }
+        .camera-card svg { width: 40px; height: 40px; fill: currentColor; }
+
+        /* PROJECTS LIST - V6.4 ACCESSIBILITY UPDATE */
+        .project-grid { display: flex; flex-direction: column; gap: 15px; }
         .project-card { 
-            background: white; border-radius: 15px; padding: 20px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08); 
+            background: white; border-radius: 20px; padding: 25px; 
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1); 
             position: relative; width: 100%; 
-            display: flex; flex-direction: row; /* Horizontal */
-            align-items: center; justify-content: flex-start; gap: 20px;
-            min-height: 90px;
+            display: flex; flex-direction: row; 
+            align-items: center; justify-content: flex-start; gap: 25px;
+            min-height: 110px; /* Increased height for larger text */
         }
-        /* NEW PROJECT BAR STYLE */
+        /* NEW PROJECT BAR - UPDATED COLOR #dcdef8 */
         .project-card.new-btn { 
-            background: #9f9cb8; 
-            border: 2px dashed #120324; 
+            background: #dcdef8; 
+            border: 3px dashed #120324; 
             color: #120324; 
             justify-content: center;
+            min-height: 90px;
         }
-        .project-card:active { transform: scale(0.98); opacity: 0.9; }
-        .project-name { font-weight: bold; font-size: 24px; color: #333; } /* 50% increase */
-        .new-btn-text { font-weight: bold; font-size: 24px; } /* 50% increase */
+        .project-card:active { transform: scale(0.97); }
         
-        /* DARKENED DELETE BUTTON */
-        .delete-btn { position: absolute; top: 12px; right: 12px; border: none; background: none; color: #444; font-size: 20px; padding: 5px; font-weight: bold; }
+        /* PROJECT NAMES - 50% SIZE INCREASE (32px) */
+        .project-name { font-weight: 800; font-size: 32px; color: #120324; line-height: 1.1; } 
+        .new-btn-text { font-weight: 800; font-size: 32px; } 
+        
+        .delete-btn { position: absolute; top: 12px; right: 12px; border: none; background: #eee; border-radius: 50%; width: 32px; height: 32px; color: #444; font-size: 18px; display: flex; justify-content: center; align-items: center; font-weight: bold; }
 
         /* FOOTER */
         .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--dmc-purple); height: 115px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 300; padding-bottom: env(safe-area-inset-bottom); }
@@ -90,17 +95,17 @@
 
 <div id="checklist-view" class="checklist-view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-        <h2 id="active-project-title" style="margin:0">Project</h2>
-        <button onclick="closeChecklist()" style="border:none; background:#ddd; width:45px; height:45px; border-radius:50%; font-size:22px;">✕</button>
+        <h2 id="active-project-title" style="margin:0; font-size: 2rem;">Project</h2>
+        <button onclick="closeChecklist()" style="border:none; background:#ddd; width:50px; height:50px; border-radius:50%; font-size:24px;">✕</button>
     </div>
     <div id="checklist-content"></div>
 </div>
 
 <div id="view-sync" class="view-section">
     <div style="background: white; border-radius: 20px; padding: 40px 20px; text-align: center;">
-        <h3>Backup Data</h3>
-        <button class="nav-btn" style="background:var(--dmc-purple); color:white; border-radius:12px; width:100%; margin-bottom:15px; padding:20px" onclick="exportData()">DOWNLOAD BACKUP FILE</button>
-        <label for="import-file" style="display:block; width:100%; padding:20px; background:#444; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">UPLOAD BACKUP FILE</label>
+        <h3 style="font-size: 1.8rem;">Backup Data</h3>
+        <button class="nav-btn" style="background:var(--dmc-purple); color:white; border-radius:12px; width:100%; margin-bottom:15px; padding:20px; font-size:18px;" onclick="exportData()">DOWNLOAD BACKUP</button>
+        <label for="import-file" style="display:block; width:100%; padding:20px; background:#444; color:white; border-radius:12px; font-weight:bold; cursor:pointer; font-size:18px;">UPLOAD BACKUP</label>
         <input type="file" id="import-file" style="display:none" onchange="importData(event)">
     </div>
 </div>
@@ -108,26 +113,45 @@
 <!-- MODALS -->
 <div id="add-project-modal" class="modal">
     <div class="modal-content">
-        <h3>New Project</h3>
-        <input type="text" id="new-proj-name" placeholder="Project Name" style="width:100%; padding:15px; border-radius:10px; margin-bottom:20px; font-size:16px;">
-        <input type="file" id="proj-image" accept="image/*" style="color:white; margin-bottom:20px; width:100%">
+        <h3 style="font-size: 2rem;">New Project</h3>
+        <input type="text" id="new-proj-name" placeholder="Project Name" style="width:100%; padding:20px; border-radius:12px; margin-bottom:20px; font-size:20px;">
+        <input type="file" id="proj-image" accept="image/*" style="color:white; margin-bottom:25px; width:100%">
         <div id="ocr-loading" style="display:none">
             <div class="spinner"></div>
-            <div>Processing Image...</div>
+            <div style="font-size: 20px;">Processing Image...</div>
         </div>
-        <button id="ocr-start-btn" onclick="processProjectImage()" style="width:100%; padding:18px; background:var(--dmc-purple); color:white; border:none; border-radius:12px; font-weight:bold;">READ IMAGE</button>
-        <button onclick="document.getElementById('add-project-modal').style.display='none'" style="margin-top:15px; color:#aaa; background:none; border:none">CANCEL</button>
+        <button id="ocr-start-btn" onclick="processProjectImage()" style="width:100%; padding:20px; background:var(--dmc-purple); color:white; border:none; border-radius:12px; font-weight:bold; font-size:20px;">READ IMAGE</button>
+        <button onclick="document.getElementById('add-project-modal').style.display='none'" style="margin-top:20px; color:#aaa; background:none; border:none; font-size:16px;">CANCEL</button>
     </div>
 </div>
 
 <div id="review-modal" class="modal">
     <div class="modal-content" style="max-height:85vh; overflow-y:auto;">
-        <h3>Confirm Colors</h3>
-        <div id="review-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:20px 0"></div>
-        <button onclick="saveProject()" style="width:100%; padding:18px; background:#2e7d32; color:white; border:none; border-radius:12px; font-weight:bold;">SAVE PROJECT</button>
+        <h3 style="font-size: 1.8rem;">Confirm Colors</h3>
+        <div id="review-list" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:25px 0"></div>
+        <button onclick="saveProject()" style="width:100%; padding:20px; background:#2e7d32; color:white; border:none; border-radius:15px; font-weight:bold; font-size:20px;">SAVE PROJECT</button>
     </div>
 </div>
 
+<div id="quantity-modal" class="modal" onclick="closeQuantitySheet()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div id="sheet-swatch" style="width:100px; height:100px; border-radius:20px; margin: 0 auto 25px; border:4px solid #444;"></div>
+        <div id="sheet-name" style="font-weight: bold; font-size:40px">DMC ---</div>
+        <div id="sheet-full-name" style="color: #aaa; font-size: 22px; margin-bottom: 10px;"></div>
+        <div class="stepper">
+            <button class="step-btn" id="minus-btn" onclick="updateQty(-1)">−</button>
+            <div id="sheet-qty" style="font-size:80px; font-weight:bold; min-width:100px;">0</div>
+            <button class="step-btn" id="plus-btn" onclick="updateQty(1)">+</button>
+        </div>
+    </div>
+</div>
+
+<div id="scanner-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:2000; flex-direction:column; justify-content:center; align-items:center;">
+    <div id="reader" style="width:100%"></div>
+    <button onclick="toggleScanner()" style="width:90%; padding:25px; margin-top:25px; border:none; background:#fff; color:#000; border-radius:20px; font-weight:bold; font-size:22px;">CLOSE SCANNER</button>
+</div>
+
+<!-- Footer -->
 <div class="footer-bar">
     <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg> ALL</button>
     <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> OWNED</button>
@@ -155,16 +179,21 @@
         renderProjects();
     }
 
-    function showTab(tab) {
+    function showTab(tabName) {
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`tab-${tab}`).classList.add('active');
-        if (tab === 'all') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = false; renderList(); }
-        else if (tab === 'owned') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = true; renderList(); }
-        else { document.getElementById(`view-${tab}`).classList.add('active'); if (tab === 'projects') renderProjects(); }
+        const activeBtn = document.getElementById(`tab-${tabName}`);
+        if (activeBtn) activeBtn.classList.add('active');
+        if (tabName === 'all' || tabName === 'owned') { 
+            document.getElementById('view-library').classList.add('active'); 
+            onlyShowOwned = (tabName === 'owned'); 
+            renderList();
+        } else {
+            document.getElementById(`view-${tabName}`).classList.add('active');
+            if (tabName === 'projects') renderProjects();
+        }
     }
 
-    // --- REFINED RENDER PROJECTS ---
     function renderProjects() {
         const grid = document.getElementById('projectGrid');
         grid.innerHTML = `<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'">
@@ -175,14 +204,13 @@
             div.className = 'project-card';
             div.onclick = () => openChecklist(idx);
             div.innerHTML = `
-                <svg style="width:48px;height:48px;fill:#666" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                <svg style="width:52px;height:52px;fill:#666;flex-shrink:0" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
                 <span class="project-name">${p.name}</span>
                 <button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${idx})">✕</button>`;
             grid.appendChild(div);
         });
     }
 
-    // --- OCR & CHECKLIST ---
     async function processProjectImage() {
         const file = document.getElementById('proj-image').files[0];
         const name = document.getElementById('new-proj-name').value;
@@ -211,8 +239,9 @@
         tempParsedColors.forEach(code => {
             const isDMC = dmcData[code];
             const div = document.createElement('div');
-            div.style.padding = '10px 15px'; div.style.background = isDMC ? '#444' : '#833'; 
-            div.style.borderRadius = '10px'; div.innerText = code + (!isDMC ? ' ?' : '');
+            div.style.padding = '12px 20px'; div.style.background = isDMC ? '#444' : '#833'; 
+            div.style.borderRadius = '12px'; div.style.fontSize = '18px'; div.style.fontWeight = 'bold';
+            div.innerText = code + (!isDMC ? ' ?' : '');
             div.onclick = () => { tempParsedColors = tempParsedColors.filter(c => c !== code); showReview(); };
             list.appendChild(div);
         });
@@ -222,6 +251,7 @@
         myProjects.push({ name, colors: tempParsedColors });
         localStorage.setItem('dmc_projects', JSON.stringify(myProjects));
         document.getElementById('review-modal').style.display = 'none';
+        document.getElementById('new-proj-name').value = '';
         renderProjects();
     }
     function openChecklist(idx) {
@@ -235,16 +265,15 @@
             const div = document.createElement('div');
             div.className = 'checklist-item';
             div.innerHTML = `<div style="display:flex; align-items:center; gap:15px;">
-                <div style="width:40px;height:40px;border-radius:10px;background:${data?data.p:'#A6A6A6'}" class="${!data?'unknown-color':''}"></div>
-                <div><b style="font-size:18px">${code}</b><br><small style="color:#888">${data?data.n:'Unknown brand'}</small></div>
-                </div><span class="status-tag ${isOwned?'owned':'need'}">${isOwned?'OWNED':'NEED'}</span>`;
+                <div style="width:50px;height:50px;border-radius:12px;background:${data?data.p:'#A6A6A6'}" class="${!data?'unknown-color':''}"></div>
+                <div><b style="font-size:22px">${code}</b><br><small style="color:#888; font-size:14px;">${data?data.n:'Unknown brand'}</small></div>
+                </div><span class="status-tag ${isOwned?'owned':'need'}" style="font-size:14px; padding: 8px 15px;">${isOwned?'OWNED':'NEED'}</span>`;
             container.appendChild(div);
         });
     }
     function closeChecklist() { document.getElementById('checklist-view').style.display = 'none'; }
     function deleteProject(idx) { if(confirm("Delete project?")) { myProjects.splice(idx, 1); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); renderProjects(); } }
 
-    // --- MAIN LIBRARY LOGIC ---
     function renderList() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         const container = document.getElementById('masterList');
@@ -270,15 +299,7 @@
         }
         document.getElementById('ownedCount').innerText = count;
     }
-
-    function openQuantitySheet(num) {
-        currentSheetNum = num; const data = dmcData[num];
-        document.getElementById('quantity-modal').style.display = 'flex';
-        document.getElementById('sheet-name').innerText = `DMC ${num}`;
-        document.getElementById('sheet-full-name').innerText = data.n;
-        document.getElementById('sheet-swatch').style.backgroundColor = data.p;
-        updateSheetUI();
-    }
+    function openQuantitySheet(num) { currentSheetNum = num; const data = dmcData[num]; document.getElementById('quantity-modal').style.display = 'flex'; document.getElementById('sheet-name').innerText = `DMC ${num}`; document.getElementById('sheet-full-name').innerText = data.n; document.getElementById('sheet-swatch').style.backgroundColor = data.p; updateSheetUI(); }
     function closeQuantitySheet() { document.getElementById('quantity-modal').style.display = 'none'; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); }
     function updateQty(delta) { myInventory[currentSheetNum] = Math.max(0, Math.min(50, (myInventory[currentSheetNum] || 0) + delta)); updateSheetUI(); }
     function updateSheetUI() { const q = myInventory[currentSheetNum] || 0; document.getElementById('sheet-qty').innerText = q; document.getElementById('minus-btn').disabled = (q <= 0); document.getElementById('plus-btn').disabled = (q >= 50); }
@@ -303,20 +324,7 @@
         } else if (html5QrcodeScanner) { html5QrcodeScanner.clear(); }
     }
     loadColors();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 </script>
-
-<div id="quantity-modal" class="modal" onclick="closeQuantitySheet()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div id="sheet-swatch" style="width:90px; height:90px; border-radius:18px; margin: 0 auto 20px; border:3px solid #444;"></div>
-        <div id="sheet-name" style="font-weight: bold; font-size:30px">DMC ---</div>
-        <div id="sheet-full-name" style="color: #aaa; font-size: 18px; margin-top: -5px; margin-bottom: 5px;"></div>
-        <div class="stepper">
-            <button class="step-btn" id="minus-btn" onclick="updateQty(-1)">−</button>
-            <div id="sheet-qty" style="font-size:64px; font-weight:bold; min-width:90px;">0</div>
-            <button class="step-btn" id="plus-btn" onclick="updateQty(1)">+</button>
-        </div>
-    </div>
-</div>
-
 </body>
 </html>
