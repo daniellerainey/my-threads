@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Strings V6.2</title>
+    <title>Strings V6.3</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png">
     <meta name="theme-color" content="#232227">
@@ -16,7 +16,7 @@
         
         body { font-family: -apple-system, sans-serif; background: var(--bg-gray); margin: 0; padding-bottom: 160px; touch-action: manipulation; }
         
-        header { background: var(--dmc-purple); color: white; padding: 35px 15px; text-align: center; position: sticky; top: 0; z-index: 200; }
+        header { background: var(--dmc-purple); color: white; padding: 30px 15px; text-align: center; position: sticky; top: 0; z-index: 200; }
         header h2 { margin: 0; font-size: 2.2rem; letter-spacing: 1px; }
 
         .view-section { display: none; padding: 15px; }
@@ -26,44 +26,36 @@
         .search-box { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .list-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 12px; margin-top: 10px; }
-        
-        /* CARD STYLES */
         .color-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; cursor: pointer; border: 4px solid transparent; transition: transform 0.1s; }
         .color-card:active { transform: scale(0.92); }
-        .color-card.owned { border-color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .color-card.owned { border-color: #000; }
+        .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; }
         .color-num { font-size: 20px; font-weight: 800; pointer-events: none; }
         .unknown-color { background-color: #A6A6A6; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px); }
 
-        /* CAMERA CARD */
-        .camera-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background: var(--dmc-purple); color: white; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(18, 3, 36, 0.1); grid-column: -1; }
-        .camera-card svg { width: 40px; height: 40px; fill: currentColor; }
-
-        /* PROJECTS LIST LAYOUT (NEW) */
+        /* PROJECTS LIST - NEW V6.3 HORIZONTAL LAYOUT */
         .project-grid { display: flex; flex-direction: column; gap: 12px; }
         .project-card { 
             background: white; border-radius: 15px; padding: 20px; 
-            text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.08); 
-            position: relative; width: 100%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; min-height: 100px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08); 
+            position: relative; width: 100%; 
+            display: flex; flex-direction: row; /* Horizontal */
+            align-items: center; justify-content: flex-start; gap: 20px;
+            min-height: 90px;
         }
-        .project-card.new-btn { border: 2px dashed #ccc; background: none; color: #999; min-height: 80px; }
-        .project-card:active { transform: scale(0.98); background: #fafafa; }
-        .project-name { font-weight: bold; margin-top: 8px; font-size: 16px; color: #333; }
-        .delete-btn { position: absolute; top: 10px; right: 10px; border: none; background: none; color: #ccc; font-size: 14px; padding: 5px; }
-
-        /* MODALS */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
-        .modal-content { background: #222; color: white; width: 90%; max-width: 450px; padding: 40px 20px; border-radius: 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        .stepper { display: flex; justify-content: center; align-items: center; gap: 30px; margin: 30px 0; }
-        .step-btn { width: 75px; height: 75px; border-radius: 50%; border: 1px solid #555; background: #333; color: white; font-size: 36px; display: flex; justify-content: center; align-items: center; }
+        /* NEW PROJECT BAR STYLE */
+        .project-card.new-btn { 
+            background: #9f9cb8; 
+            border: 2px dashed #120324; 
+            color: #120324; 
+            justify-content: center;
+        }
+        .project-card:active { transform: scale(0.98); opacity: 0.9; }
+        .project-name { font-weight: bold; font-size: 24px; color: #333; } /* 50% increase */
+        .new-btn-text { font-weight: bold; font-size: 24px; } /* 50% increase */
         
-        /* CHECKLIST */
-        .checklist-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f5f5; z-index: 500; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
-        .checklist-item { background: white; margin-bottom: 10px; padding: 18px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .status-tag { font-weight: bold; font-size: 11px; padding: 6px 12px; border-radius: 20px; text-transform: uppercase; }
-        .status-tag.need { color: #d32f2f; background: #ffebee; }
-        .status-tag.owned { color: #2e7d32; background: #e8f5e9; }
+        /* DARKENED DELETE BUTTON */
+        .delete-btn { position: absolute; top: 12px; right: 12px; border: none; background: none; color: #444; font-size: 20px; padding: 5px; font-weight: bold; }
 
         /* FOOTER */
         .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--dmc-purple); height: 115px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 300; padding-bottom: env(safe-area-inset-bottom); }
@@ -71,8 +63,14 @@
         .nav-btn.active { color: #ffffff !important; border-bottom: 4px solid #ffffff !important; }
         .nav-icon { width: 36px; height: 36px; fill: currentColor; }
 
-        #scanner-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; }
-        #reader { width: 100%; max-width: 500px; border-radius: 20px; overflow: hidden; }
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-content { background: #222; color: white; width: 90%; max-width: 450px; padding: 40px 20px; border-radius: 30px; text-align: center; }
+        .checklist-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f5f5; z-index: 500; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
+        .checklist-item { background: white; margin-bottom: 10px; padding: 18px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .status-tag { font-weight: bold; font-size: 11px; padding: 6px 12px; border-radius: 20px; text-transform: uppercase; }
+        .status-tag.need { color: #d32f2f; background: #ffebee; }
+        .status-tag.owned { color: #2e7d32; background: #e8f5e9; }
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -130,25 +128,6 @@
     </div>
 </div>
 
-<div id="quantity-modal" class="modal" onclick="closeQuantitySheet()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div id="sheet-swatch" style="width:90px; height:90px; border-radius:18px; margin: 0 auto 20px; border:3px solid #444;"></div>
-        <div id="sheet-name" style="font-weight: bold; font-size:30px">DMC ---</div>
-        <div id="sheet-full-name" style="color: #aaa; font-size: 18px; margin-top: -5px; margin-bottom: 5px;"></div>
-        <div class="stepper">
-            <button class="step-btn" id="minus-btn" onclick="updateQty(-1)">−</button>
-            <div id="sheet-qty" style="font-size:64px; font-weight:bold; min-width:90px;">0</div>
-            <button class="step-btn" id="plus-btn" onclick="updateQty(1)">+</button>
-        </div>
-    </div>
-</div>
-
-<div id="scanner-container">
-    <div id="reader"></div>
-    <button onclick="toggleScanner()" style="width:90%; padding:20px; margin-top:20px; border:none; background:#fff; color:#000; border-radius:15px; font-weight:bold;">CLOSE SCANNER</button>
-</div>
-
-<!-- FOOTER -->
 <div class="footer-bar">
     <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg> ALL</button>
     <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> OWNED</button>
@@ -176,38 +155,34 @@
         renderProjects();
     }
 
-    function showTab(tabName) {
+    function showTab(tab) {
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        const activeBtn = document.getElementById(`tab-${tabName}`);
-        if (activeBtn) activeBtn.classList.add('active');
-        if (tabName === 'all' || tabName === 'owned') { 
-            document.getElementById('view-library').classList.add('active'); 
-            onlyShowOwned = (tabName === 'owned'); 
-            renderList();
-        } else {
-            document.getElementById(`view-${tabName}`).classList.add('active');
-            if (tabName === 'projects') renderProjects();
-        }
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        if (tab === 'all') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = false; renderList(); }
+        else if (tab === 'owned') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = true; renderList(); }
+        else { document.getElementById(`view-${tab}`).classList.add('active'); if (tab === 'projects') renderProjects(); }
     }
 
+    // --- REFINED RENDER PROJECTS ---
     function renderProjects() {
         const grid = document.getElementById('projectGrid');
         grid.innerHTML = `<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'">
-            <div style="font-size:30px">+</div><div class="project-name">new project</div>
+            <div class="new-btn-text">+ new project</div>
         </div>`;
         myProjects.forEach((p, idx) => {
             const div = document.createElement('div');
             div.className = 'project-card';
             div.onclick = () => openChecklist(idx);
-            div.innerHTML = `<svg style="width:48px;height:48px;fill:#666" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+            div.innerHTML = `
+                <svg style="width:48px;height:48px;fill:#666" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
                 <span class="project-name">${p.name}</span>
                 <button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${idx})">✕</button>`;
             grid.appendChild(div);
         });
     }
 
-    // --- OCR & CHECKLIST LOGIC (Same as V6.1) ---
+    // --- OCR & CHECKLIST ---
     async function processProjectImage() {
         const file = document.getElementById('proj-image').files[0];
         const name = document.getElementById('new-proj-name').value;
@@ -247,7 +222,6 @@
         myProjects.push({ name, colors: tempParsedColors });
         localStorage.setItem('dmc_projects', JSON.stringify(myProjects));
         document.getElementById('review-modal').style.display = 'none';
-        document.getElementById('new-proj-name').value = '';
         renderProjects();
     }
     function openChecklist(idx) {
@@ -270,7 +244,7 @@
     function closeChecklist() { document.getElementById('checklist-view').style.display = 'none'; }
     function deleteProject(idx) { if(confirm("Delete project?")) { myProjects.splice(idx, 1); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); renderProjects(); } }
 
-    // --- CORE LOGIC ---
+    // --- MAIN LIBRARY LOGIC ---
     function renderList() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         const container = document.getElementById('masterList');
@@ -296,7 +270,15 @@
         }
         document.getElementById('ownedCount').innerText = count;
     }
-    function openQuantitySheet(num) { currentSheetNum = num; const data = dmcData[num]; document.getElementById('quantity-modal').style.display = 'flex'; document.getElementById('sheet-name').innerText = `DMC ${num}`; document.getElementById('sheet-full-name').innerText = data.n; document.getElementById('sheet-swatch').style.backgroundColor = data.p; updateSheetUI(); }
+
+    function openQuantitySheet(num) {
+        currentSheetNum = num; const data = dmcData[num];
+        document.getElementById('quantity-modal').style.display = 'flex';
+        document.getElementById('sheet-name').innerText = `DMC ${num}`;
+        document.getElementById('sheet-full-name').innerText = data.n;
+        document.getElementById('sheet-swatch').style.backgroundColor = data.p;
+        updateSheetUI();
+    }
     function closeQuantitySheet() { document.getElementById('quantity-modal').style.display = 'none'; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); }
     function updateQty(delta) { myInventory[currentSheetNum] = Math.max(0, Math.min(50, (myInventory[currentSheetNum] || 0) + delta)); updateSheetUI(); }
     function updateSheetUI() { const q = myInventory[currentSheetNum] || 0; document.getElementById('sheet-qty').innerText = q; document.getElementById('minus-btn').disabled = (q <= 0); document.getElementById('plus-btn').disabled = (q >= 50); }
@@ -305,8 +287,36 @@
     function exportData() { const blob = new Blob([JSON.stringify({ inventory: myInventory, projects: myProjects })], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Strings_Backup.json`; a.click(); }
     function importData(event) { const reader = new FileReader(); reader.onload = (e) => { const data = JSON.parse(e.target.result); myInventory = data.inventory || {}; myProjects = data.projects || []; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); location.reload(); }; reader.readAsText(event.target.files[0]); }
     let scannerActive = false, html5QrcodeScanner = null;
-    function toggleScanner() { const c = document.getElementById('scanner-container'); scannerActive = !scannerActive; c.style.display = scannerActive ? 'flex' : 'none'; if (scannerActive) { html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }); html5QrcodeScanner.render((barcode) => { let colorNum = barcodeMap[barcode]; if (!colorNum) { colorNum = prompt(`New Barcode: ${barcode}\nWhat DMC #?`); if (colorNum) { colorNum = colorNum.replace('*','').toUpperCase().trim(); barcodeMap[barcode] = colorNum; } } if (colorNum) { myInventory[colorNum] = (myInventory[colorNum] || 0) + 1; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); if (navigator.vibrate) navigator.vibrate(100); } }); } else if (html5QrcodeScanner) { html5QrcodeScanner.clear(); } }
+    function toggleScanner() {
+        const c = document.getElementById('scanner-container'); scannerActive = !scannerActive;
+        c.style.display = scannerActive ? 'flex' : 'none';
+        if (scannerActive) {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render((barcode) => {
+                let colorNum = barcodeMap[barcode];
+                if (!colorNum) {
+                    colorNum = prompt(`New Barcode: ${barcode}\nWhat DMC #?`);
+                    if (colorNum) { colorNum = colorNum.replace('*','').toUpperCase().trim(); barcodeMap[barcode] = colorNum; }
+                }
+                if (colorNum) { myInventory[colorNum] = (myInventory[colorNum] || 0) + 1; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); if (navigator.vibrate) navigator.vibrate(100); }
+            });
+        } else if (html5QrcodeScanner) { html5QrcodeScanner.clear(); }
+    }
     loadColors();
 </script>
+
+<div id="quantity-modal" class="modal" onclick="closeQuantitySheet()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div id="sheet-swatch" style="width:90px; height:90px; border-radius:18px; margin: 0 auto 20px; border:3px solid #444;"></div>
+        <div id="sheet-name" style="font-weight: bold; font-size:30px">DMC ---</div>
+        <div id="sheet-full-name" style="color: #aaa; font-size: 18px; margin-top: -5px; margin-bottom: 5px;"></div>
+        <div class="stepper">
+            <button class="step-btn" id="minus-btn" onclick="updateQty(-1)">−</button>
+            <div id="sheet-qty" style="font-size:64px; font-weight:bold; min-width:90px;">0</div>
+            <button class="step-btn" id="plus-btn" onclick="updateQty(1)">+</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
