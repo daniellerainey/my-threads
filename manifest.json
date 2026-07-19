@@ -1,6 +1,6 @@
 {
-  "name": "DMC Thread Tracker",
-  "short_name": "DMC Tracker",
+  "name": "Strings",
+  "short_name": "Strings",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#232227",
