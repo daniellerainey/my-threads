@@ -32,26 +32,18 @@
         
         .status-dot { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid white; color: white; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .status-dot.owned { background: #2e7d32; } .status-dot.need { background: #d32f2f; }
-        .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; }
+        .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .color-num { font-size: 20px; font-weight: 800; pointer-events: none; }
         .unknown-color { background-color: #A6A6A6; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px); }
 
-        /* PROJECTS */
+        /* PROJECTS LIST */
         .project-grid { display: flex; flex-direction: column; gap: 15px; }
         .project-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); position: relative; width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 25px; min-height: 110px; cursor: pointer; }
         .project-card.new-btn { background: #dcdef8; border: 3px dashed #120324; color: #120324; justify-content: center; min-height: 90px; }
         .project-name { font-weight: 800; font-size: 32px; color: #120324; line-height: 1.1; } 
-        .new-btn-text { font-weight: 800; font-size: 32px; } 
-
-        /* TOP RIGHT DELETE BUTTON (SUBTLE CIRCLE) */
-        .delete-btn { 
-            position: absolute; top: 10px; right: 10px; 
-            border: none; background: #e8e8e8; border-radius: 50%; 
-            width: 24px; height: 24px; color: #888; font-size: 12px; 
-            display: flex; justify-content: center; align-items: center; 
-            font-weight: bold; cursor: pointer;
-        }
-        .delete-btn:active { background: #ccc; color: #333; }
+        
+        /* 1. LARGER/DARKER DELETE BUTTON */
+        .delete-btn { position: absolute; top: 12px; right: 12px; border: none; background: none; color: #000; font-size: 24px; font-weight: 900; padding: 5px; }
 
         /* FOOTER */
         .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--dmc-purple); height: 115px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 300; padding-bottom: env(safe-area-inset-bottom); }
@@ -59,59 +51,62 @@
         .nav-btn.active { color: #ffffff !important; border-bottom: 4px solid #ffffff !important; }
         .nav-icon { width: 36px; height: 36px; fill: currentColor; }
 
-        /* MODAL STYLES */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-x: hidden; }
-        .modal-content { background: #222; color: white; width: 95%; max-width: 600px; padding: 60px 25px; border-radius: 45px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        .modal-input { width: 100%; padding: 25px; border-radius: 20px; border: none; margin-bottom: 30px; font-size: 32px; font-weight: 800; text-align: center; background: white; color: #120324; }
-        .modal-file-label { display: block; width: 100%; padding: 25px; background: #333; border: 2px dashed #555; border-radius: 20px; margin-bottom: 40px; color: #aaa; font-weight: bold; font-size: 20px; cursor: pointer; }
-        .modal-main-btn { width: 100%; padding: 25px; background: #120324; color: white; border: 2px solid #333; border-radius: 25px; font-weight: 400; font-size: 32px; letter-spacing: 1px; }
-        .modal-cancel-btn { margin-top: 30px; color: #888; background: none; border: none; font-size: 18px; font-weight: bold; text-transform: uppercase; }
+        /* CHECKLIST VIEW - V6.9.4 Header Update */
+        .checklist-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f5f5; z-index: 1000; padding: 20px; overflow-y: auto; padding-bottom: 140px; }
+        .checklist-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .back-btn { background: none; border: none; color: #120324; padding: 0; display: flex; align-items: center; }
+        #active-project-title { margin: 0; font-size: 2.4rem; color: #120324; font-weight: 800; line-height: 1; flex: 1; }
 
-        /* REVIEW SCREEN */
-        #review-modal .modal-content { width: 98%; max-width: 1000px; padding: 30px 10px; height: 90vh; display: flex; flex-direction: column; }
-        .review-split { display: flex; width: 100%; flex: 1; gap: 10px; margin: 15px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; padding: 10px 0; min-height: 0; }
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-content { background: #222; color: white; width: 95%; max-width: 600px; padding: 60px 25px; border-radius: 45px; text-align: center; }
+        .modal-input { width: 100%; padding: 25px; border-radius: 20px; border: none; margin-bottom: 30px; font-size: 32px; font-weight: 800; text-align: center; }
+        .modal-main-btn { width: 100%; padding: 25px; background: #120324; color: white; border-radius: 25px; font-size: 32px; border: 2px solid #333; }
+        
+        #review-modal .modal-content { width: 98%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; padding: 30px 10px; }
+        .review-split { display: flex; flex: 1; gap: 10px; margin: 15px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; padding: 10px 0; min-height: 0; }
         .review-img-side { flex: 1; overflow: auto; background: #000; border-radius: 15px; border: 1px solid #333; }
         .review-img-side img { display: block; width: 100%; height: auto; object-fit: contain; }
         .review-list-side { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .review-input-row { display: flex; gap: 5px; align-items: center; padding-right: 5px; }
-        .review-input-row input { flex: 1; padding: 15px 5px; border-radius: 12px; border: none; font-size: 20px; font-weight: 800; text-align: center; background: #444; color: white; }
+        .review-input-row { display: flex; gap: 5px; align-items: center; }
+        .review-input-row input { flex: 1; padding: 15px 5px; border-radius: 12px; border: none; font-size: 22px; font-weight: 800; text-align: center; background: #444; color: white; }
         .review-input-row input.valid { background: var(--dmc-green); }
         .review-input-row input.invalid { background: var(--dmc-red); }
 
-        /* CHECKLIST VIEW (LARGE TITLE) */
-        #checklist-view { background: var(--bg-gray); z-index: 250; }
-        .checklist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px 0; }
-        .checklist-close-btn { border: none; background: #ccc; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; color: #120324; font-weight: bold; }
-
+        #scanner-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
+        .camera-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background: var(--dmc-purple); color: white; border: 4px solid #fff; grid-column: -1; }
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        #scanner-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; }
-        .camera-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background: var(--dmc-purple); color: white; border: 4px solid #fff; grid-column: -1; }
     </style>
 </head>
 <body>
 
 <header><h2>My Strings</h2></header>
 
-<!-- Main Sections -->
+<!-- Main Inventory -->
 <div id="view-library" class="view-section active">
     <div class="controls"><input type="text" id="searchInput" class="search-box" placeholder="Search color #..." oninput="renderList()"></div>
     <div id="masterList" class="list-container"></div>
 </div>
 
+<!-- Folder View -->
 <div id="view-projects" class="view-section">
     <div class="project-grid" id="projectGrid"></div>
 </div>
 
-<!-- Checklist View with Larger Title -->
-<div id="checklist-view" class="view-section">
+<!-- Individual Project Checklist -->
+<div id="checklist-view" class="checklist-view">
     <div class="checklist-header">
-        <h2 id="active-project-title" style="margin:0; font-size: 2.5rem; color: #120324; font-weight: 900;">Project Name</h2>
-        <button class="checklist-close-btn" onclick="closeChecklist()">✕</button>
+        <button class="back-btn" onclick="closeChecklist()">
+            <!-- BACK ARROW SVG -->
+            <svg style="width:40px;height:40px;fill:currentColor" viewBox="0 0 24 24"><path d="M20,11H7.83l5.59-5.59L12,4l-8,8l8,8l1.41-1.41L7.83,13H20V11z"/></svg>
+        </button>
+        <h2 id="active-project-title">Project Name</h2>
     </div>
     <div id="checklist-content" class="checklist-grid"></div>
 </div>
 
+<!-- Sync View -->
 <div id="view-sync" class="view-section">
     <div style="background: white; border-radius: 20px; padding: 40px 20px; text-align: center;">
         <h3>Backup Data</h3>
@@ -122,16 +117,16 @@
 </div>
 
 <!-- Modals -->
-<div id="add-project-modal" class="modal"><div class="modal-content"><h2>New Project</h2><input type="text" id="new-proj-name" class="modal-input" placeholder="Project Name"><label for="proj-image" class="modal-file-label" id="file-label">TAP TO SELECT IMAGE</label><input type="file" id="proj-image" accept="image/*" style="display:none" onchange="document.getElementById('file-label').innerText = this.files[0].name"><div id="ocr-loading" style="display:none"><div class="spinner"></div><div>Reading Image...</div></div><button id="ocr-start-btn" class="modal-main-btn" onclick="processProjectImage()">CONTINUE</button><button class="modal-cancel-btn" onclick="document.getElementById('add-project-modal').style.display='none'">CANCEL</button></div></div>
+<div id="add-project-modal" class="modal"><div class="modal-content"><h2>New Project</h2><input type="text" id="new-proj-name" class="modal-input" placeholder="Project Name"><label for="proj-image" style="display:block; padding:25px; background:#333; border-radius:20px; margin-bottom:40px; font-size:20px; color:#aaa; border:2px dashed #555; cursor:pointer;" id="file-label">TAP TO SELECT IMAGE</label><input type="file" id="proj-image" accept="image/*" style="display:none" onchange="document.getElementById('file-label').innerText = this.files[0].name"><div id="ocr-loading" style="display:none"><div class="spinner"></div><div>Reading Image...</div></div><button id="ocr-start-btn" class="modal-main-btn" onclick="processProjectImage()" style="font-weight:400">CONTINUE</button><button onclick="document.getElementById('add-project-modal').style.display='none'" style="margin-top:30px; color:#aaa; background:none; border:none; font-size:18px; font-weight:bold; text-transform:uppercase;">CANCEL</button></div></div>
 <div id="review-modal" class="modal"><div class="modal-content"><h2>Review Colors</h2><div class="review-split"><div class="review-img-side"><img id="review-image-display" src=""></div><div class="review-list-side" id="review-list-side"></div></div><button onclick="saveProject()" style="width:100%; padding:20px; background:var(--dmc-green); color:white; border:none; border-radius:20px; font-weight:bold; font-size:24px;">SAVE PROJECT</button></div></div>
 <div id="quantity-modal" class="modal" onclick="closeQuantitySheet()"><div class="modal-content" onclick="event.stopPropagation()"><div id="sheet-swatch" style="width:110px; height:110px; border-radius:25px; margin: 0 auto 30px; border:4px solid #444;"></div><div id="sheet-name" style="font-weight:bold; font-size:45px">DMC ---</div><div id="sheet-full-name" style="color:#aaa; font-size:24px; margin-bottom:15px;"></div><div class="stepper"><button class="step-btn" onclick="updateQty(-1)">−</button><div id="sheet-qty" style="font-size:90px; font-weight:bold; min-width:110px;">0</div><button class="step-btn" onclick="updateQty(1)">+</button></div></div></div>
 <div id="scanner-container"><div id="reader"></div><button onclick="toggleScanner()" style="width:90%; padding:25px; margin-top:25px; border:none; background:#fff; color:#000; border-radius:20px; font-weight:bold; font-size:22px;">CLOSE SCANNER</button></div>
 
 <div class="footer-bar">
-    <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg> ALL</button>
-    <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> OWNED</button>
-    <button class="nav-btn" onclick="showTab('projects')" id="tab-projects"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg> PROJECTS</button>
-    <button class="nav-btn" onclick="showTab('sync')" id="tab-sync"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 3V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm-6 8c0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6z"/></svg> SYNC</button>
+    <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg>ALL</button>
+    <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>OWNED</button>
+    <button class="nav-btn" onclick="showTab('projects')" id="tab-projects"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>PROJECTS</button>
+    <button class="nav-btn" onclick="showTab('sync')" id="tab-sync"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 3V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm-6 8c0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6z"/></svg>SYNC</button>
 </div>
 
 <script>
@@ -143,26 +138,12 @@
     function updateReviewItemSilent(i,el){ const v=el.value.trim().toUpperCase(); reviewList[i]=v; el.className=dmcData[v]?'valid':'invalid'; }
     function removeReviewItem(i){ reviewList.splice(i,1); renderReviewList(); }
     function saveProject(){ const n=document.getElementById('new-proj-name').value; myProjects.push({name:n,colors:reviewList.filter(c=>c!=="")}); localStorage.setItem('dmc_projects',JSON.stringify(myProjects)); document.getElementById('review-modal').style.display='none'; renderProjects(); }
-    
-    function renderProjects(){ 
-        const g=document.getElementById('projectGrid'); 
-        g.innerHTML=`<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`; 
-        myProjects.forEach((p,i)=>{ 
-            const d=document.createElement('div'); 
-            d.className='project-card'; 
-            d.onclick=()=>openChecklist(i); 
-            d.innerHTML=`<svg style="width:52px;height:52px;fill:#666;flex-shrink:0" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-                <span class="project-name">${p.name}</span>
-                <button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${i})">✕</button>`; 
-            g.appendChild(d); 
-        }); 
-    }
-
-    function openChecklist(i){ const p=myProjects[i]; document.querySelectorAll('.view-section').forEach(s=>s.classList.remove('active')); document.getElementById('checklist-view').classList.add('active'); document.getElementById('active-project-title').innerText=p.name; const c=document.getElementById('checklist-content'); c.innerHTML=''; p.colors.forEach(code=>{ const q=myInventory[code]||0, isO=q>0, d=dmcData[code.toUpperCase()], h=d?d.p:"#A6A6A6", card=document.createElement('div'); card.className=`check-card ${isO?'owned-border':''} ${!d?'unknown-color':''}`; card.style.backgroundColor=h; card.style.color=getContrastColor(h); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(code); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.innerHTML=`<span class="color-num">${code}</span><div class="status-dot ${isO?'owned':'need'}">${isO?'✓':'✕'}</div>`; c.appendChild(card); }); }
+    function renderProjects(){ const g=document.getElementById('projectGrid'); g.innerHTML=`<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`; myProjects.forEach((p,i)=>{ const d=document.createElement('div'); d.className='project-card'; d.onclick=()=>openChecklist(i); d.innerHTML=`<svg style="width:52px;height:52px;fill:#666" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg><span class="project-name">${p.name}</span><button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${i})">✕</button>`; g.appendChild(d); }); }
+    function openChecklist(i){ const p=myProjects[i]; document.querySelectorAll('.view-section').forEach(s=>s.classList.remove('active')); document.getElementById('checklist-view').style.display='block'; document.getElementById('active-project-title').innerText=p.name; const c=document.getElementById('checklist-content'); c.innerHTML=''; p.colors.forEach(code=>{ const q=myInventory[code]||0, isO=q>0, d=dmcData[code.toUpperCase()], h=d?d.p:"#A6A6A6", card=document.createElement('div'); card.className=`check-card ${isO?'owned-border':''} ${!d?'unknown-color':''}`; card.style.backgroundColor=h; card.style.color=getContrastColor(h); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(code); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.innerHTML=`<span class="color-num">${code}</span><div class="status-dot ${isO?'owned':'need'}">${isO?'✓':'✕'}</div>`; c.appendChild(card); }); }
     function closeChecklist(){ showTab('projects'); }
-    function renderList(){ const q=document.getElementById('searchInput').value.toLowerCase(), c=document.getElementById('masterList'); c.innerHTML=''; let count=0; sortedKeys.forEach(n=>{ const qty=myInventory[n]||0; if(onlyShowOwned&&qty===0)return; if(q&&!n.toLowerCase().includes(q))return; const d=dmcData[n], card=document.createElement('div'); card.className=`color-card ${qty>0?'owned':''}`; card.style.backgroundColor=d.p; card.style.color=getContrastColor(d.p); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(n); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchmove',(e)=>{if(Math.sqrt(Math.pow(e.touches[0].pageX-touchStartPos.x,2)+Math.pow(e.touches[0].pageY-touchStartPos.y,2))>10)clearTimeout(longPressTimer);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.oncontextmenu=(e)=>e.preventDefault(); card.innerHTML=`<span class="color-num">${n}</span>`+(qty>=1?`<div class="qty-badge">${qty}</div>`:''); c.appendChild(card); if(qty>0)count++; }); if(!onlyShowOwned&&!q){ const cam=document.createElement('div'); cam.className='camera-card'; cam.onclick=toggleScanner; cam.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>`; c.appendChild(cam); } document.getElementById('ownedCount').innerText=count; }
+    function renderList(){ const q=document.getElementById('searchInput').value.toLowerCase(), c=document.getElementById('masterList'); c.innerHTML=''; let count=0; sortedKeys.forEach(n=>{ const qty=myInventory[n]||0; if(onlyShowOwned&&qty===0)return; if(q&&!n.toLowerCase().includes(q))return; const d=dmcData[n], card=document.createElement('div'); card.className=`color-card ${qty > 0?'owned':''}`; card.style.backgroundColor=d.p; card.style.color=getContrastColor(d.p); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(n); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchmove',(e)=>{if(Math.sqrt(Math.pow(e.touches[0].pageX-touchStartPos.x,2)+Math.pow(e.touches[0].pageY-touchStartPos.y,2))>10)clearTimeout(longPressTimer);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.oncontextmenu=(e)=>e.preventDefault(); card.innerHTML=`<span class="color-num">${n}</span>`+(qty>=1?`<div class="qty-badge">${qty}</div>`:''); c.appendChild(card); if(qty>0)count++; }); if(!onlyShowOwned&&!q){ const cam=document.createElement('div'); cam.className='camera-card'; cam.onclick=toggleScanner; cam.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>`; c.appendChild(cam); } document.getElementById('ownedCount').innerText=count; }
     function openQuantitySheet(n){ currentSheetNum=n; const d=dmcData[n.toUpperCase()]; document.getElementById('quantity-modal').style.display='flex'; document.getElementById('sheet-name').innerText=`DMC ${n}`; document.getElementById('sheet-full-name').innerText=d?d.n:"Unknown Brand"; document.getElementById('sheet-swatch').style.backgroundColor=d?d.p:"#A6A6A6"; updateSheetUI(); }
-    function closeQuantitySheet(){ document.getElementById('quantity-modal').style.display='none'; localStorage.setItem('dmc_v5_quantities',JSON.stringify(myInventory)); renderList(); if(document.getElementById('checklist-view').classList.contains('active')){ const idx=myProjects.findIndex(p=>p.name===document.getElementById('active-project-title').innerText); if(idx!==-1)openChecklist(idx); } }
+    function closeQuantitySheet(){ document.getElementById('quantity-modal').style.display='none'; localStorage.setItem('dmc_v5_quantities',JSON.stringify(myInventory)); renderList(); if(document.getElementById('checklist-view').style.display==='block'){ const title=document.getElementById('active-project-title').innerText; const idx=myProjects.findIndex(p=>p.name===title); if(idx!==-1)openChecklist(idx); } }
     function updateQty(d){ myInventory[currentSheetNum]=Math.max(0,Math.min(50,(myInventory[currentSheetNum]||0)+d)); updateSheetUI(); }
     function updateSheetUI(){ const q = myInventory[currentSheetNum] || 0; document.getElementById('sheet-qty').innerText = q; }
     function getContrastColor(h){ const r=parseInt(h.substr(1,2),16), g=parseInt(h.substr(3,2),16), b=parseInt(h.substr(5,2),16); return (((r*299)+(g*587)+(b*114))/1000 >= 128)?'black':'white'; }
