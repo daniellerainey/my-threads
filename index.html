@@ -10,302 +10,101 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src='https://unpkg.com/tesseract.js@v4.0.2/dist/tesseract.min.js'></script>
     <style>
-        :root { --dmc-purple: #120324; --bg-gray: #f5f5f5; --dmc-green: #2e7d32; --dmc-red: #833; }
+        :root { --dmc-purple: #120324; --dmc-green: #2e7d32; --dmc-red: #833; }
         * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         input { -webkit-user-select: text; user-select: text; }
-        
-        body { font-family: -apple-system, sans-serif; background: var(--bg-gray); margin: 0; padding-bottom: 160px; touch-action: manipulation; }
-        
-        header { background: var(--dmc-purple); color: white; padding: 30px 15px; text-align: center; position: sticky; top: 0; z-index: 200; }
+        body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding-bottom: 160px; touch-action: manipulation; }
+        header { background: var(--dmc-purple); color: white; padding: 35px 15px; text-align: center; position: sticky; top: 0; z-index: 200; }
         header h2 { margin: 0; font-size: 2.2rem; letter-spacing: 1px; }
-
         .view-section { display: none; padding: 15px; }
         .view-section.active { display: block; }
-
-        .controls { background: var(--bg-gray); position: sticky; top: 95px; z-index: 150; padding: 10px 0 25px 0; }
+        .controls { background: #f5f5f5; position: sticky; top: 105px; z-index: 150; padding: 10px 0 25px 0; }
         .search-box { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-
         .list-container, .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 12px; margin-top: 10px; }
-        .color-card, .check-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; cursor: pointer; border: 4px solid transparent; transition: transform 0.1s; }
-        .color-card:active, .check-card:active { transform: scale(0.92); }
+        .color-card, .check-card { aspect-ratio: 1/1; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; cursor: pointer; border: 3px solid transparent; transition: transform 0.1s; }
         .color-card.owned, .check-card.owned-border { border-color: #000; }
-        .status-dot { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid white; color: white; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .status-dot { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid white; color: white; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; z-index: 10; }
         .status-dot.owned { background: #2e7d32; } .status-dot.need { background: #d32f2f; }
         .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; }
         .color-num { font-size: 20px; font-weight: 800; pointer-events: none; }
-        .unknown-color { background-color: #A6A6A6; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px); }
-
         .project-grid { display: flex; flex-direction: column; gap: 15px; }
-        .project-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); position: relative; width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 25px; min-height: 110px; cursor: pointer; }
+        .project-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); position: relative; display: flex; align-items: center; gap: 25px; min-height: 110px; }
         .project-card.new-btn { background: #dcdef8; border: 3px dashed #120324; color: #120324; justify-content: center; min-height: 90px; }
-        .project-name { font-weight: 800; font-size: 32px; color: #120324; line-height: 1.1; } 
-        .delete-btn { position: absolute; top: 12px; right: 12px; border: none; background: #eee; border-radius: 50%; width: 32px; height: 32px; color: #444; font-size: 18px; display: flex; justify-content: center; align-items: center; font-weight: bold; }
-
+        .project-name, .new-btn-text { font-weight: 800; font-size: 32px; color: #120324; }
+        .delete-btn { position: absolute; top: 12px; right: 12px; border: none; background: #eee; border-radius: 50%; width: 32px; height: 32px; color: #444; font-weight: bold; }
         .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--dmc-purple); height: 115px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 300; padding-bottom: env(safe-area-inset-bottom); }
         .nav-btn { background: none; border: none; color: rgba(255, 255, 255, 0.4); font-size: 14px; font-weight: bold; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 4px solid transparent; }
-        .nav-btn.active { color: #ffffff !important; border-bottom: 4px solid #ffffff !important; }
+        .nav-btn.active { color: #fff !important; border-bottom: 4px solid #fff !important; }
         .nav-icon { width: 36px; height: 36px; fill: currentColor; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-x: hidden; }
-        .modal-content { background: #222; color: white; width: 95%; max-width: 600px; padding: 60px 25px; border-radius: 45px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        
-        .modal-input { width: 100%; padding: 25px; border-radius: 20px; border: none; margin-bottom: 30px; font-size: 32px; font-weight: 800; text-align: center; background: white; color: #120324; }
-        .modal-file-label { display: block; width: 100%; padding: 25px; background: #333; border: 2px dashed #555; border-radius: 20px; margin-bottom: 40px; color: #aaa; font-weight: bold; font-size: 20px; cursor: pointer; }
-        .modal-main-btn { width: 100%; padding: 25px; background: #120324; color: white; border: 2px solid #333; border-radius: 25px; font-weight: 400; font-size: 32px; letter-spacing: 1px; }
-        .modal-cancel-btn { margin-top: 30px; color: #888; background: none; border: none; font-size: 18px; font-weight: bold; text-transform: uppercase; }
-
-        /* REVIEW SCREEN */
-        #review-modal .modal-content { width: 98%; max-width: 1000px; padding: 30px 10px; height: 90vh; display: flex; flex-direction: column; }
-        .review-split { display: flex; width: 100%; flex: 1; gap: 10px; margin: 15px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; padding: 10px 0; min-height: 0; }
-        .review-img-side { flex: 1; overflow: auto; background: #000; border-radius: 15px; border: 1px solid #333; position: relative; }
-        .review-img-side img { display: block; width: 100%; height: auto; min-height: 100%; object-fit: contain; }
-        .review-list-side { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .review-input-row { display: flex; gap: 5px; align-items: center; padding-right: 5px; }
-        
-        /* INPUT FIX: Use Classes for colors instead of overwriting style */
-        .review-input-row input { flex: 1; padding: 15px 5px; border-radius: 12px; border: none; font-size: 20px; font-weight: 800; text-align: center; background: #444; color: white; }
+        .modal, .checklist-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; overflow-y: auto; }
+        .modal { background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
+        .modal-content { background: #222; color: #fff; width: 95%; max-width: 600px; padding: 50px 25px; border-radius: 40px; text-align: center; }
+        .modal-input { width: 100%; padding: 25px; border-radius: 20px; border: none; margin-bottom: 30px; font-size: 32px; font-weight: 800; text-align: center; }
+        .modal-file-label { display: block; padding: 25px; background: #333; border-radius: 20px; margin-bottom: 40px; font-size: 20px; color: #aaa; border: 2px dashed #555; }
+        .modal-main-btn { width: 100%; padding: 25px; background: #120324; color: #fff; border-radius: 25px; font-size: 32px; border: 2px solid #333; }
+        #review-modal .modal-content { width: 98%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; }
+        .review-split { display: flex; flex: 1; gap: 10px; margin: 15px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; padding: 10px 0; min-height: 0; }
+        .review-img-side { flex: 1; overflow: auto; background: #000; border-radius: 15px; border: 1px solid #333; }
+        .review-img-side img { width: 100%; height: auto; touch-action: pinch-zoom; }
+        .review-list-side { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .review-input-row { display: flex; gap: 5px; align-items: center; }
+        .review-input-row input { flex: 1; padding: 15px 5px; border-radius: 12px; border: none; font-size: 22px; font-weight: 800; text-align: center; background: #444; color: #fff; }
         .review-input-row input.valid { background: var(--dmc-green); }
         .review-input-row input.invalid { background: var(--dmc-red); }
-
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        #scanner-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; }
+        .camera-card { aspect-ratio: 1/1; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background: var(--dmc-purple); color: white; border: 4px solid #fff; grid-column: -1; }
+        .unknown-color { background-color: #A6A6A6; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px); }
     </style>
 </head>
 <body>
-
 <header><h2>My Strings</h2></header>
-
 <div id="view-library" class="view-section active">
     <div class="controls"><input type="text" id="searchInput" class="search-box" placeholder="Search color #..." oninput="renderList()"></div>
     <div id="masterList" class="list-container"></div>
 </div>
-
-<div id="view-projects" class="view-section">
-    <div class="project-grid" id="projectGrid"></div>
-</div>
-
+<div id="view-projects" class="view-section"><div class="project-grid" id="projectGrid"></div></div>
 <div id="checklist-view" class="view-section" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#f5f5f5; z-index:500; padding:20px; overflow-y:auto; padding-bottom:120px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-        <h2 id="active-project-title" style="margin:0; font-size: 2rem;">Project</h2>
-        <button onclick="closeChecklist()" style="border:none; background:#ddd; width:50px; height:50px; border-radius:50%; font-size:24px;">✕</button>
-    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;"><h2 id="active-project-title" style="margin:0">Project</h2><button onclick="closeChecklist()" style="border:none; background:#ddd; width:50px; height:50px; border-radius:50%; font-size:24px;">✕</button></div>
     <div id="checklist-content" class="checklist-grid"></div>
 </div>
-
 <div id="view-sync" class="view-section">
-    <div style="background: white; border-radius: 20px; padding: 40px 20px; text-align: center;">
-        <h3>Backup Data</h3>
-        <button class="nav-btn" style="background:var(--dmc-purple); color:white; border-radius:12px; width:100%; margin-bottom:15px; padding:20px; font-size:18px;" onclick="exportData()">DOWNLOAD BACKUP</button>
-        <label for="import-file" style="display:block; width:100%; padding:20px; background:#444; color:white; border-radius:12px; font-weight:bold; cursor:pointer; font-size:18px;">UPLOAD BACKUP</label>
-        <input type="file" id="import-file" style="display:none" onchange="importData(event)">
-    </div>
+    <div style="background: white; border-radius: 20px; padding: 40px 20px; text-align: center;"><h3>Backup Data</h3><button class="nav-btn" style="background:var(--dmc-purple); color:white; border-radius:12px; width:100%; margin-bottom:15px; padding:20px; font-size:18px;" onclick="exportData()">DOWNLOAD BACKUP</button><label for="import-file" style="display:block; width:100%; padding:20px; background:#444; color:white; border-radius:12px; font-weight:bold; cursor:pointer; font-size:18px;">UPLOAD BACKUP</label><input type="file" id="import-file" style="display:none" onchange="importData(event)"></div>
 </div>
-
-<!-- MODALS -->
-<div id="add-project-modal" class="modal">
-    <div class="modal-content">
-        <h2 style="font-size: 2.8rem; margin-bottom: 40px;">New Project</h2>
-        <input type="text" id="new-proj-name" class="modal-input" placeholder="Project Name">
-        <label for="proj-image" class="modal-file-label" id="file-label">TAP TO SELECT IMAGE</label>
-        <input type="file" id="proj-image" accept="image/*" style="display:none" onchange="document.getElementById('file-label').innerText = this.files[0].name">
-        <div id="ocr-loading" style="display:none; margin-bottom: 30px;">
-            <div class="spinner"></div>
-            <div style="font-size: 20px; font-weight: bold;">Reading Image...</div>
-        </div>
-        <button id="ocr-start-btn" class="modal-main-btn" onclick="processProjectImage()">CONTINUE</button>
-        <button class="modal-cancel-btn" onclick="document.getElementById('add-project-modal').style.display='none'">CANCEL</button>
-    </div>
-</div>
-
-<div id="review-modal" class="modal">
-    <div class="modal-content">
-        <h2 style="font-size: 2rem; margin-bottom:0">Review Colors</h2>
-        <div class="review-split">
-            <div class="review-img-side" id="img-scroller">
-                <img id="review-image-display" src="" alt="Source">
-            </div>
-            <div class="review-list-side" id="review-list-side"></div>
-        </div>
-        <button onclick="saveProject()" style="width:100%; padding:20px; background:var(--dmc-green); color:white; border:none; border-radius:20px; font-weight:bold; font-size:24px;">SAVE PROJECT</button>
-    </div>
-</div>
-
-<div id="quantity-modal" class="modal" onclick="closeQuantitySheet()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div id="sheet-swatch" style="width:110px; height:110px; border-radius:25px; margin: 0 auto 30px; border:4px solid #444;"></div>
-        <div id="sheet-name" style="font-weight: bold; font-size:45px">DMC ---</div>
-        <div id="sheet-full-name" style="color: #aaa; font-size: 24px; margin-bottom: 15px;"></div>
-        <div class="stepper">
-            <button class="step-btn" id="minus-btn" onclick="updateQty(-1)">−</button>
-            <div id="sheet-qty" style="font-size:90px; font-weight:bold; min-width:110px;">0</div>
-            <button class="step-btn" id="plus-btn" onclick="updateQty(1)">+</button>
-        </div>
-    </div>
-</div>
-
-<div id="scanner-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:2000; flex-direction:column; justify-content:center; align-items:center;">
-    <div id="reader" style="width:100%"></div>
-    <button onclick="toggleScanner()" style="width:90%; padding:25px; margin-top:25px; border:none; background:#fff; color:#000; border-radius:20px; font-weight:bold; font-size:22px;">CLOSE SCANNER</button>
-</div>
-
+<div id="add-project-modal" class="modal"><div class="modal-content"><h2>New Project</h2><input type="text" id="new-proj-name" class="modal-input" placeholder="Project Name"><label for="proj-image" class="modal-file-label" id="file-label">TAP TO SELECT IMAGE</label><input type="file" id="proj-image" accept="image/*" style="display:none" onchange="document.getElementById('file-label').innerText = this.files[0].name"><div id="ocr-loading" style="display:none"><div class="spinner"></div><div>Reading Image...</div></div><button id="ocr-start-btn" class="modal-main-btn" onclick="processProjectImage()">CONTINUE</button><button class="modal-cancel-btn" onclick="document.getElementById('add-project-modal').style.display='none'">CANCEL</button></div></div>
+<div id="review-modal" class="modal"><div class="modal-content"><h2>Review Colors</h2><div class="review-split"><div class="review-img-side"><img id="review-image-display" src=""></div><div class="review-list-side" id="review-list-side"></div></div><button onclick="saveProject()" style="width:100%; padding:20px; background:var(--dmc-green); color:white; border:none; border-radius:20px; font-weight:bold; font-size:24px;">SAVE PROJECT</button></div></div>
+<div id="quantity-modal" class="modal" onclick="closeQuantitySheet()"><div class="modal-content" onclick="event.stopPropagation()"><div id="sheet-swatch" style="width:110px; height:110px; border-radius:25px; margin: 0 auto 30px; border:4px solid #444;"></div><div id="sheet-name" style="font-weight:bold; font-size:45px">DMC ---</div><div id="sheet-full-name" style="color:#aaa; font-size:24px; margin-bottom:15px;"></div><div class="stepper"><button class="step-btn" onclick="updateQty(-1)">−</button><div id="sheet-qty" style="font-size:90px; font-weight:bold; min-width:110px;">0</div><button class="step-btn" onclick="updateQty(1)">+</button></div></div></div>
+<div id="scanner-container"><div id="reader"></div><button onclick="toggleScanner()" style="width:90%; padding:25px; margin-top:25px; border:none; background:#fff; color:#000; border-radius:20px; font-weight:bold; font-size:22px;">CLOSE SCANNER</button></div>
 <div class="footer-bar">
-    <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg> ALL</button>
-    <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> OWNED</button>
-    <button class="nav-btn" onclick="showTab('projects')" id="tab-projects"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg> PROJECTS</button>
-    <button class="nav-btn" onclick="showTab('sync')" id="tab-sync"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 3V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm-6 8c0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6z"/></svg> SYNC</button>
+    <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg>ALL</button>
+    <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>OWNED</button>
+    <button class="nav-btn" onclick="showTab('projects')" id="tab-projects"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>PROJECTS</button>
+    <button class="nav-btn" onclick="showTab('sync')" id="tab-sync"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 3V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm-6 8c0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6z"/></svg>SYNC</button>
 </div>
-
 <script>
-    let dmcData = {}, sortedKeys = [], myInventory = JSON.parse(localStorage.getItem('dmc_v5_quantities')) || {};
-    let myProjects = JSON.parse(localStorage.getItem('dmc_projects')) || [];
-    let barcodeMap = JSON.parse(localStorage.getItem('dmc_barcodes_v4')) || {"077540050727":"208"};
-    let onlyShowOwned = false, longPressTimer, touchStartPos = { x: 0, y: 0 }, currentSheetNum = null;
-    let reviewList = [];
-
-    async function loadColors() {
-        const response = await fetch('./colors.json?v=' + Date.now()); 
-        dmcData = await response.json();
-        sortedKeys = Object.keys(dmcData).sort((a, b) => {
-            const isANum = !isNaN(a); const isBNum = !isNaN(b);
-            if (isANum && isBNum) return parseInt(a) - parseInt(b);
-            if (isANum) return -1; if (isBNum) return 1;
-            return a.localeCompare(b);
-        });
-        renderList(); renderProjects();
-    }
-
-    function showTab(tabName) {
-        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        const activeBtn = document.getElementById(`tab-${tabName}`);
-        if (activeBtn) activeBtn.classList.add('active');
-        if (tabName === 'all' || tabName === 'owned') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = (tabName === 'owned'); renderList(); }
-        else { document.getElementById(`view-${tabName}`).classList.add('active'); if (tabName === 'projects') renderProjects(); }
-    }
-
-    async function processProjectImage() {
-        const fileInput = document.getElementById('proj-image');
-        const nameInput = document.getElementById('new-proj-name');
-        if (!fileInput.files[0] || !nameInput.value) return alert("Select image and name");
-        document.getElementById('ocr-loading').style.display = 'block';
-        document.getElementById('ocr-start-btn').style.display = 'none';
-        const file = fileInput.files[0];
-        document.getElementById('review-image-display').src = URL.createObjectURL(file);
-        
-        const worker = await Tesseract.createWorker();
-        await worker.loadLanguage('eng'); await worker.initialize('eng');
-        await worker.setParameters({ tessedit_char_whitelist: '0123456789' });
-        const { data: { text } } = await worker.recognize(file);
-        await worker.terminate();
-
-        const codes = text.match(/\b\d{1,4}\b/g) || [];
-        reviewList = [...new Set(codes)];
-        document.getElementById('ocr-loading').style.display = 'none';
-        document.getElementById('ocr-start-btn').style.display = 'block';
-        document.getElementById('add-project-modal').style.display = 'none';
-        if (navigator.vibrate) navigator.vibrate(200);
-        renderReviewList();
-    }
-
-    // --- UPDATED REVIEW LIST (NO RE-RENDERING ON TYPE) ---
-    function renderReviewList() {
-        document.getElementById('review-modal').style.display = 'flex';
-        const side = document.getElementById('review-list-side');
-        side.innerHTML = '';
-        reviewList.forEach((code, idx) => {
-            const row = document.createElement('div');
-            row.className = 'review-input-row';
-            const isValid = dmcData[code.toUpperCase()];
-            row.innerHTML = `
-                <input type="text" value="${code}" 
-                    class="${isValid ? 'valid' : 'invalid'}" 
-                    oninput="updateReviewItemSilent(${idx}, this)"
-                    placeholder="####">
-                <button onclick="removeReviewItem(${idx})" style="background:none;border:none;color:#ff6b6b;font-size:24px">✕</button>
-            `;
-            side.appendChild(row);
-        });
-        const addBtn = document.createElement('button');
-        addBtn.className = 'add-row-btn';
-        addBtn.innerText = "+ Add Color";
-        addBtn.onclick = () => { reviewList.push(""); renderReviewList(); };
-        side.appendChild(addBtn);
-    }
-
-    // FIX: Update internal data and colors without redrawing the HTML
-    function updateReviewItemSilent(idx, inputElement) {
-        const val = inputElement.value.trim().toUpperCase();
-        reviewList[idx] = val;
-        if (dmcData[val]) {
-            inputElement.className = 'valid';
-        } else {
-            inputElement.className = 'invalid';
-        }
-    }
-
-    function removeReviewItem(idx) { reviewList.splice(idx, 1); renderReviewList(); }
-    function saveProject() { const name = document.getElementById('new-proj-name').value; myProjects.push({ name, colors: reviewList.filter(c=>c!=="") }); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); document.getElementById('review-modal').style.display = 'none'; renderProjects(); }
-
-    function openChecklist(idx) {
-        const p = myProjects[idx]; document.getElementById('checklist-view').style.display = 'block'; document.getElementById('active-project-title').innerText = p.name;
-        const container = document.getElementById('checklist-content'); container.innerHTML = '';
-        p.colors.forEach(code => {
-            const qty = myInventory[code] || 0; const isOwned = qty > 0; const data = dmcData[code.toUpperCase()];
-            const card = document.createElement('div'); card.className = `check-card ${isOwned ? 'owned-border' : ''} ${!data ? 'unknown-color' : ''}`;
-            card.style.backgroundColor = data ? data.p : "#A6A6A6"; card.style.color = getContrastColor(data ? data.p : "#A6A6A6");
-            card.addEventListener('touchstart', (e) => { const pos = e.touches[0]; touchStartPos = { x: pos.pageX, y: pos.pageY }; longPressTimer = setTimeout(() => { openQuantitySheet(code); if (navigator.vibrate) navigator.vibrate(50); }, 500); }, { passive: true });
-            card.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
-            card.innerHTML = `<span class="color-num">${code}</span><div class="status-dot ${isOwned ? 'owned' : 'need'}">${isOwned ? '✓' : '✕'}</div>`;
-            container.appendChild(card);
-        });
-    }
-
-    function renderList() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
-        const container = document.getElementById('masterList'); container.innerHTML = ''; let count = 0;
-        sortedKeys.forEach(num => {
-            const qty = myInventory[num] || 0; if (onlyShowOwned && qty === 0) return; if (q && !num.toLowerCase().includes(q)) return;
-            const data = dmcData[num], card = document.createElement('div'); card.className = `color-card ${qty > 0 ? 'owned' : ''}`;
-            card.style.backgroundColor = data.p; card.style.color = getContrastColor(data.p);
-            card.addEventListener('touchstart', (e) => { const pos = e.touches[0]; touchStartPos = { x: pos.pageX, y: pos.pageY }; longPressTimer = setTimeout(() => { openQuantitySheet(num); if (navigator.vibrate) navigator.vibrate(50); }, 500); }, { passive: true });
-            card.addEventListener('touchmove', (e) => { if (Math.sqrt(Math.pow(e.touches[0].pageX - touchStartPos.x, 2) + Math.pow(e.touches[0].pageY - touchStartPos.y, 2)) > 10) clearTimeout(longPressTimer); }, { passive: true });
-            card.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
-            card.oncontextmenu = (e) => e.preventDefault();
-            card.innerHTML = `<span class="color-num">${num}</span>` + (qty >= 1 ? `<div class="qty-badge">${qty}</div>` : '');
-            container.appendChild(card); if(qty > 0) count++;
-        });
-        if (!onlyShowOwned && !q) {
-            const cam = document.createElement('div'); cam.className = 'camera-card'; cam.onclick = toggleScanner;
-            cam.innerHTML = `<svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>`;
-            container.appendChild(cam);
-        }
-        document.getElementById('ownedCount').innerText = count;
-    }
-
-    function openQuantitySheet(num) { currentSheetNum = num; const data = dmcData[num.toUpperCase()]; document.getElementById('quantity-modal').style.display = 'flex'; document.getElementById('sheet-name').innerText = `DMC ${num}`; document.getElementById('sheet-full-name').innerText = data ? data.n : "Unknown Brand"; document.getElementById('sheet-swatch').style.backgroundColor = data ? data.p : "#A6A6A6"; updateSheetUI(); }
-    function closeQuantitySheet() { document.getElementById('quantity-modal').style.display = 'none'; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); if(document.getElementById('checklist-view').style.display === 'block') { const activeTitle = document.getElementById('active-project-title').innerText; const activeIdx = myProjects.findIndex(p => p.name === activeTitle); if(activeIdx !== -1) openChecklist(activeIdx); } }
-    function updateQty(delta) { myInventory[currentSheetNum] = Math.max(0, Math.min(50, (myInventory[currentSheetNum] || 0) + delta)); updateSheetUI(); }
-    function updateSheetUI() { const q = myInventory[currentSheetNum] || 0; document.getElementById('sheet-qty').innerText = q; document.getElementById('minus-btn').disabled = (q <= 0); document.getElementById('plus-btn').disabled = (q >= 50); }
-    function getContrastColor(hex) { const r = parseInt(hex.substr(1,2),16), g = parseInt(hex.substr(3,2),16), b = parseInt(hex.substr(5,2),16); return (((r*299)+(g*587)+(b*114))/1000 >= 128) ? 'black' : 'white'; }
-    function exportData() { const blob = new Blob([JSON.stringify({ inventory: myInventory, projects: myProjects })], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Strings_Backup.json`; a.click(); }
-    function importData(event) { const reader = new FileReader(); reader.onload = (e) => { const data = JSON.parse(e.target.result); myInventory = data.inventory || {}; myProjects = data.projects || []; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); location.reload(); }; reader.readAsText(event.target.files[0]); }
-    
-    let scannerActive = false, html5QrcodeScanner = null;
-    function toggleScanner() {
-        const c = document.getElementById('scanner-container'); scannerActive = !scannerActive;
-        c.style.display = scannerActive ? 'flex' : 'none';
-        if (scannerActive) {
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-            html5QrcodeScanner.render((barcode) => {
-                let colorNum = barcodeMap[barcode];
-                if (!colorNum) {
-                    colorNum = prompt(`New Barcode: ${barcode}\nWhat DMC #?`);
-                    if (colorNum) { colorNum = colorNum.replace('*','').toUpperCase().trim(); barcodeMap[barcode] = colorNum; }
-                }
-                if (colorNum) { myInventory[colorNum] = (myInventory[colorNum] || 0) + 1; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); if (navigator.vibrate) navigator.vibrate(100); }
-            });
-        } else if (html5QrcodeScanner) { html5QrcodeScanner.clear(); }
-    }
+    let dmcData={}, sortedKeys=[], myInventory=JSON.parse(localStorage.getItem('dmc_v5_quantities'))||{}, myProjects=JSON.parse(localStorage.getItem('dmc_projects'))||[], barcodeMap=JSON.parse(localStorage.getItem('dmc_barcodes_v4'))||{"077540050727":"208"}, onlyShowOwned=false, longPressTimer, touchStartPos={x:0,y:0}, currentSheetNum=null, reviewList=[];
+    async function loadColors(){ const r=await fetch('./colors.json?v='+Date.now()); dmcData=await r.json(); sortedKeys=Object.keys(dmcData).sort((a,b)=>{const isA=!isNaN(a),isB=!isNaN(b); if(isA&&isB)return parseInt(a)-parseInt(b); if(isA)return -1; if(isB)return 1; return a.localeCompare(b);}); renderList(); renderProjects(); }
+    function showTab(t){ document.querySelectorAll('.view-section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`tab-${t}`).classList.add('active'); if(t==='all'||t==='owned'){document.getElementById('view-library').classList.add('active'); onlyShowOwned=(t==='owned'); renderList();} else {document.getElementById(`view-${t}`).classList.add('active'); if(t==='projects')renderProjects();} }
+    async function processProjectImage(){ const fi=document.getElementById('proj-image'), ni=document.getElementById('new-proj-name'); if(!fi.files[0]||!ni.value)return alert("Select image and name"); document.getElementById('ocr-loading').style.display='block'; document.getElementById('ocr-start-btn').style.display='none'; const file=fi.files[0]; document.getElementById('review-image-display').src=URL.createObjectURL(file); const worker=await Tesseract.createWorker(); await worker.loadLanguage('eng'); await worker.initialize('eng'); await worker.setParameters({tessedit_char_whitelist:'0123456789'}); const {data:{text}}=await worker.recognize(file); await worker.terminate(); const codes=text.match(/\b\d{1,4}\b/g)||[]; reviewList=[...new Set(codes)]; document.getElementById('ocr-loading').style.display='none'; document.getElementById('ocr-start-btn').style.display='block'; document.getElementById('add-project-modal').style.display='none'; if(navigator.vibrate)navigator.vibrate(200); renderReviewList(); }
+    function renderReviewList(){ document.getElementById('review-modal').style.display='flex'; const s=document.getElementById('review-list-side'); s.innerHTML=''; reviewList.forEach((c,i)=>{ const r=document.createElement('div'); r.className='review-input-row'; const v=dmcData[c.toUpperCase()]; r.innerHTML=`<input type="text" value="${c}" class="${v?'valid':'invalid'}" oninput="updateReviewItemSilent(${i},this)"><button onclick="removeReviewItem(${i})" style="background:none;border:none;color:#ff6b6b;font-size:24px">✕</button>`; s.appendChild(r); }); const b=document.createElement('button'); b.className='add-row-btn'; b.innerText="+ Add Color"; b.onclick=()=>{reviewList.push(""); renderReviewList();}; s.appendChild(b); }
+    function updateReviewItemSilent(i,el){ const v=el.value.trim().toUpperCase(); reviewList[i]=v; el.className=dmcData[v]?'valid':'invalid'; }
+    function removeReviewItem(i){ reviewList.splice(i,1); renderReviewList(); }
+    function saveProject(){ const n=document.getElementById('new-proj-name').value; myProjects.push({name:n,colors:reviewList.filter(c=>c!=="")}); localStorage.setItem('dmc_projects',JSON.stringify(myProjects)); document.getElementById('review-modal').style.display='none'; renderProjects(); }
+    function renderProjects(){ const g=document.getElementById('projectGrid'); g.innerHTML=`<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`; myProjects.forEach((p,i)=>{ const d=document.createElement('div'); d.className='project-card'; d.onclick=()=>openChecklist(i); d.innerHTML=`<svg style="width:52px;height:52px;fill:#666" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg><span class="project-name">${p.name}</span><button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${i})">✕</button>`; g.appendChild(d); }); }
+    function openChecklist(i){ const p=myProjects[i]; document.getElementById('checklist-view').style.display='block'; document.getElementById('active-project-title').innerText=p.name; const c=document.getElementById('checklist-content'); c.innerHTML=''; p.colors.forEach(code=>{ const q=myInventory[code]||0, isO=q>0, d=dmcData[code.toUpperCase()], h=d?d.p:"#A6A6A6", card=document.createElement('div'); card.className=`check-card ${isO?'owned-border':''} ${!d?'unknown-color':''}`; card.style.backgroundColor=h; card.style.color=getContrastColor(h); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(code); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.innerHTML=`<span class="color-num">${code}</span><div class="status-dot ${isO?'owned':'need'}">${isO?'✓':'✕'}</div>`; c.appendChild(card); }); }
+    function renderList(){ const q=document.getElementById('searchInput').value.toLowerCase(), c=document.getElementById('masterList'); c.innerHTML=''; let count=0; sortedKeys.forEach(n=>{ const qty=myInventory[n]||0; if(onlyShowOwned&&qty===0)return; if(q&&!n.toLowerCase().includes(q))return; const d=dmcData[n], card=document.createElement('div'); card.className=`color-card ${qty>0?'owned':''}`; card.style.backgroundColor=d.p; card.style.color=getContrastColor(d.p); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(n); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchmove',(e)=>{if(Math.sqrt(Math.pow(e.touches[0].pageX-touchStartPos.x,2)+Math.pow(e.touches[0].pageY-touchStartPos.y,2))>10)clearTimeout(longPressTimer);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.oncontextmenu=(e)=>e.preventDefault(); card.innerHTML=`<span class="color-num">${n}</span>`+(qty>=1?`<div class="qty-badge">${qty}</div>`:''); c.appendChild(card); if(qty>0)count++; }); if(!onlyShowOwned&&!q){ const cam=document.createElement('div'); cam.className='camera-card'; cam.onclick=toggleScanner; cam.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>`; c.appendChild(cam); } document.getElementById('ownedCount').innerText=count; }
+    function openQuantitySheet(n){ currentSheetNum=n; const d=dmcData[n.toUpperCase()]; document.getElementById('quantity-modal').style.display='flex'; document.getElementById('sheet-name').innerText=`DMC ${n}`; document.getElementById('sheet-full-name').innerText=d?d.n:"Unknown Brand"; document.getElementById('sheet-swatch').style.backgroundColor=d?d.p:"#A6A6A6"; updateSheetUI(); }
+    function closeQuantitySheet(){ document.getElementById('quantity-modal').style.display='none'; localStorage.setItem('dmc_v5_quantities',JSON.stringify(myInventory)); renderList(); if(document.getElementById('checklist-view').style.display==='block'){ const idx=myProjects.findIndex(p=>p.name===document.getElementById('active-project-title').innerText); if(idx!==-1)openChecklist(idx); } }
+    function updateQty(d){ myInventory[currentSheetNum]=Math.max(0,Math.min(50,(myInventory[currentSheetNum]||0)+d)); updateSheetUI(); }
+    function updateSheetUI(){ const q=myInventory[currentSheetNum]||0; document.getElementById('sheet-qty').innerText=q; }
+    function getContrastColor(h){ const r=parseInt(h.substr(1,2),16), g=parseInt(h.substr(3,2),16), b=parseInt(h.substr(5,2),16); return (((r*299)+(g*587)+(b*114))/1000 >= 128)?'black':'white'; }
+    function closeChecklist(){ document.getElementById('checklist-view').style.display='none'; }
+    function deleteProject(i){ if(confirm("Delete project?")){myProjects.splice(i,1); localStorage.setItem('dmc_projects',JSON.stringify(myProjects)); renderProjects();}}
+    function exportData(){ const b=new Blob([JSON.stringify({inventory:myInventory,projects:myProjects})],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`Strings_Backup.json`; a.click(); }
+    function importData(e){ const r=new FileReader(); r.onload=(ev)=>{const d=JSON.parse(ev.target.result); myInventory=d.inventory||{}; myProjects=d.projects||[]; localStorage.setItem('dmc_v5_quantities',JSON.stringify(myInventory)); localStorage.setItem('dmc_projects',JSON.stringify(myProjects)); location.reload();}; r.readAsText(e.target.files[0]); }
+    let scannerActive=false, html5QrcodeScanner=null;
+    function toggleScanner(){ const c=document.getElementById('scanner-container'); scannerActive=!scannerActive; c.style.display=scannerActive?'flex':'none'; if(scannerActive){ html5QrcodeScanner=new Html5QrcodeScanner("reader",{fps:10,qrbox:250}); html5QrcodeScanner.render((b)=>{let cNum=barcodeMap[b]; if(!cNum){cNum=prompt(`New Barcode: ${b}\nWhat DMC #?`); if(cNum){cNum=cNum.replace('*','').toUpperCase().trim(); barcodeMap[b]=cNum;}} if(cNum){myInventory[cNum]=(myInventory[cNum]||0)+1; localStorage.setItem('dmc_v5_quantities',JSON.stringify(myInventory)); renderList(); if(navigator.vibrate)navigator.vibrate(100);}}); } else if(html5QrcodeScanner){html5QrcodeScanner.clear();} }
     loadColors();
 </script>
 </body>
