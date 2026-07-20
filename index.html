@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Strings V6.9.3</title>
+    <title>Strings V6.9.4</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png">
     <meta name="theme-color" content="#232227">
@@ -43,6 +43,16 @@
         .project-name { font-weight: 800; font-size: 32px; color: #120324; line-height: 1.1; } 
         .new-btn-text { font-weight: 800; font-size: 32px; } 
 
+        /* TOP RIGHT DELETE BUTTON (SUBTLE CIRCLE) */
+        .delete-btn { 
+            position: absolute; top: 10px; right: 10px; 
+            border: none; background: #e8e8e8; border-radius: 50%; 
+            width: 24px; height: 24px; color: #888; font-size: 12px; 
+            display: flex; justify-content: center; align-items: center; 
+            font-weight: bold; cursor: pointer;
+        }
+        .delete-btn:active { background: #ccc; color: #333; }
+
         /* FOOTER */
         .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--dmc-purple); height: 115px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 300; padding-bottom: env(safe-area-inset-bottom); }
         .nav-btn { background: none; border: none; color: rgba(255, 255, 255, 0.4); font-size: 14px; font-weight: bold; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 4px solid transparent; }
@@ -68,7 +78,7 @@
         .review-input-row input.valid { background: var(--dmc-green); }
         .review-input-row input.invalid { background: var(--dmc-red); }
 
-        /* FIXED CHECKLIST VIEW (UI UPDATE) */
+        /* CHECKLIST VIEW (LARGE TITLE) */
         #checklist-view { background: var(--bg-gray); z-index: 250; }
         .checklist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px 0; }
         .checklist-close-btn { border: none; background: #ccc; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; color: #120324; font-weight: bold; }
@@ -93,10 +103,10 @@
     <div class="project-grid" id="projectGrid"></div>
 </div>
 
-<!-- Updated Checklist View -->
+<!-- Checklist View with Larger Title -->
 <div id="checklist-view" class="view-section">
     <div class="checklist-header">
-        <h2 id="active-project-title" style="margin:0; font-size: 1.8rem; color: #120324; font-weight: 800;">Project Name</h2>
+        <h2 id="active-project-title" style="margin:0; font-size: 2.5rem; color: #120324; font-weight: 900;">Project Name</h2>
         <button class="checklist-close-btn" onclick="closeChecklist()">✕</button>
     </div>
     <div id="checklist-content" class="checklist-grid"></div>
@@ -133,10 +143,24 @@
     function updateReviewItemSilent(i,el){ const v=el.value.trim().toUpperCase(); reviewList[i]=v; el.className=dmcData[v]?'valid':'invalid'; }
     function removeReviewItem(i){ reviewList.splice(i,1); renderReviewList(); }
     function saveProject(){ const n=document.getElementById('new-proj-name').value; myProjects.push({name:n,colors:reviewList.filter(c=>c!=="")}); localStorage.setItem('dmc_projects',JSON.stringify(myProjects)); document.getElementById('review-modal').style.display='none'; renderProjects(); }
-    function renderProjects(){ const g=document.getElementById('projectGrid'); g.innerHTML=`<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`; myProjects.forEach((p,i)=>{ const d=document.createElement('div'); d.className='project-card'; d.onclick=()=>openChecklist(i); d.innerHTML=`<svg style="width:52px;height:52px;fill:#666" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg><span class="project-name">${p.name}</span><button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${i})">✕</button>`; g.appendChild(d); }); }
+    
+    function renderProjects(){ 
+        const g=document.getElementById('projectGrid'); 
+        g.innerHTML=`<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`; 
+        myProjects.forEach((p,i)=>{ 
+            const d=document.createElement('div'); 
+            d.className='project-card'; 
+            d.onclick=()=>openChecklist(i); 
+            d.innerHTML=`<svg style="width:52px;height:52px;fill:#666;flex-shrink:0" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+                <span class="project-name">${p.name}</span>
+                <button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${i})">✕</button>`; 
+            g.appendChild(d); 
+        }); 
+    }
+
     function openChecklist(i){ const p=myProjects[i]; document.querySelectorAll('.view-section').forEach(s=>s.classList.remove('active')); document.getElementById('checklist-view').classList.add('active'); document.getElementById('active-project-title').innerText=p.name; const c=document.getElementById('checklist-content'); c.innerHTML=''; p.colors.forEach(code=>{ const q=myInventory[code]||0, isO=q>0, d=dmcData[code.toUpperCase()], h=d?d.p:"#A6A6A6", card=document.createElement('div'); card.className=`check-card ${isO?'owned-border':''} ${!d?'unknown-color':''}`; card.style.backgroundColor=h; card.style.color=getContrastColor(h); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(code); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.innerHTML=`<span class="color-num">${code}</span><div class="status-dot ${isO?'owned':'need'}">${isO?'✓':'✕'}</div>`; c.appendChild(card); }); }
     function closeChecklist(){ showTab('projects'); }
-    function renderList(){ const q=document.getElementById('searchInput').value.toLowerCase(), c=document.getElementById('masterList'); c.innerHTML=''; let count=0; sortedKeys.forEach(n=>{ const qty=myInventory[n]||0; if(onlyShowOwned&&qty===0)return; if(q&&!n.toLowerCase().includes(q))return; const d=dmcData[n], card=document.createElement('div'); card.className=`color-card ${qty > 0?'owned':''}`; card.style.backgroundColor=d.p; card.style.color=getContrastColor(d.p); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(n); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchmove',(e)=>{if(Math.sqrt(Math.pow(e.touches[0].pageX-touchStartPos.x,2)+Math.pow(e.touches[0].pageY-touchStartPos.y,2))>10)clearTimeout(longPressTimer);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.oncontextmenu=(e)=>e.preventDefault(); card.innerHTML=`<span class="color-num">${n}</span>`+(qty>=1?`<div class="qty-badge">${qty}</div>`:''); c.appendChild(card); if(qty>0)count++; }); if(!onlyShowOwned&&!q){ const cam=document.createElement('div'); cam.className='camera-card'; cam.onclick=toggleScanner; cam.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>`; c.appendChild(cam); } document.getElementById('ownedCount').innerText=count; }
+    function renderList(){ const q=document.getElementById('searchInput').value.toLowerCase(), c=document.getElementById('masterList'); c.innerHTML=''; let count=0; sortedKeys.forEach(n=>{ const qty=myInventory[n]||0; if(onlyShowOwned&&qty===0)return; if(q&&!n.toLowerCase().includes(q))return; const d=dmcData[n], card=document.createElement('div'); card.className=`color-card ${qty>0?'owned':''}`; card.style.backgroundColor=d.p; card.style.color=getContrastColor(d.p); card.addEventListener('touchstart',(e)=>{touchStartPos={x:e.touches[0].pageX,y:e.touches[0].pageY}; longPressTimer=setTimeout(()=>{openQuantitySheet(n); if(navigator.vibrate)navigator.vibrate(50);},500);}, {passive:true}); card.addEventListener('touchmove',(e)=>{if(Math.sqrt(Math.pow(e.touches[0].pageX-touchStartPos.x,2)+Math.pow(e.touches[0].pageY-touchStartPos.y,2))>10)clearTimeout(longPressTimer);}, {passive:true}); card.addEventListener('touchend',()=>clearTimeout(longPressTimer)); card.oncontextmenu=(e)=>e.preventDefault(); card.innerHTML=`<span class="color-num">${n}</span>`+(qty>=1?`<div class="qty-badge">${qty}</div>`:''); c.appendChild(card); if(qty>0)count++; }); if(!onlyShowOwned&&!q){ const cam=document.createElement('div'); cam.className='camera-card'; cam.onclick=toggleScanner; cam.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>`; c.appendChild(cam); } document.getElementById('ownedCount').innerText=count; }
     function openQuantitySheet(n){ currentSheetNum=n; const d=dmcData[n.toUpperCase()]; document.getElementById('quantity-modal').style.display='flex'; document.getElementById('sheet-name').innerText=`DMC ${n}`; document.getElementById('sheet-full-name').innerText=d?d.n:"Unknown Brand"; document.getElementById('sheet-swatch').style.backgroundColor=d?d.p:"#A6A6A6"; updateSheetUI(); }
     function closeQuantitySheet(){ document.getElementById('quantity-modal').style.display='none'; localStorage.setItem('dmc_v5_quantities',JSON.stringify(myInventory)); renderList(); if(document.getElementById('checklist-view').classList.contains('active')){ const idx=myProjects.findIndex(p=>p.name===document.getElementById('active-project-title').innerText); if(idx!==-1)openChecklist(idx); } }
     function updateQty(d){ myInventory[currentSheetNum]=Math.max(0,Math.min(50,(myInventory[currentSheetNum]||0)+d)); updateSheetUI(); }
