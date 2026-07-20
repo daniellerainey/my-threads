@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Strings V6.7</title>
+    <title>Strings V6.8</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png">
     <meta name="theme-color" content="#232227">
@@ -22,55 +22,55 @@
         .view-section { display: none; padding: 15px; }
         .view-section.active { display: block; }
 
-        .controls { background: var(--bg-gray); position: sticky; top: 105px; z-index: 150; padding: 10px 0 25px 0; }
+        .controls { background: var(--bg-gray); position: sticky; top: 95px; z-index: 150; padding: 10px 0 25px 0; }
         .search-box { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .list-container, .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 12px; margin-top: 10px; }
-        .color-card, .check-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; cursor: pointer; border: 3px solid transparent; transition: transform 0.1s; }
+        .color-card, .check-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; cursor: pointer; border: 4px solid transparent; transition: transform 0.1s; }
         .color-card:active, .check-card:active { transform: scale(0.92); }
         .color-card.owned, .check-card.owned-border { border-color: #000; }
-
         .status-dot { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%; border: 2.5px solid white; color: white; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .status-dot.owned { background: #2e7d32; } 
-        .status-dot.need { background: #d32f2f; }
-
+        .status-dot.owned { background: #2e7d32; } .status-dot.need { background: #d32f2f; }
         .qty-badge { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 2.5px solid #fff; font-weight: 900; z-index: 5; }
         .color-num { font-size: 20px; font-weight: 800; pointer-events: none; }
         .unknown-color { background-color: #A6A6A6; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px); }
 
+        /* PROJECTS */
         .project-grid { display: flex; flex-direction: column; gap: 15px; }
         .project-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); position: relative; width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 25px; min-height: 110px; cursor: pointer; }
         .project-card.new-btn { background: #dcdef8; border: 3px dashed #120324; color: #120324; justify-content: center; min-height: 90px; }
         .project-name { font-weight: 800; font-size: 32px; color: #120324; line-height: 1.1; } 
-        .new-btn-text { font-weight: 800; font-size: 32px; } 
         .delete-btn { position: absolute; top: 12px; right: 12px; border: none; background: #eee; border-radius: 50%; width: 32px; height: 32px; color: #444; font-size: 18px; display: flex; justify-content: center; align-items: center; font-weight: bold; }
 
+        /* FOOTER */
         .footer-bar { position: fixed; bottom: 0; width: 100%; background: var(--dmc-purple); height: 115px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 300; padding-bottom: env(safe-area-inset-bottom); }
         .nav-btn { background: none; border: none; color: rgba(255, 255, 255, 0.4); font-size: 14px; font-weight: bold; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 4px solid transparent; }
         .nav-btn.active { color: #ffffff !important; border-bottom: 4px solid #ffffff !important; }
         .nav-icon { width: 36px; height: 36px; fill: currentColor; }
 
-        .modal, .checklist-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; overflow-y: auto; }
-        .modal { background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
-        .checklist-view { background: #f5f5f5; padding: 20px; padding-bottom: 140px; }
+        /* VERTICAL MODALS - V6.8 Update */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-content { background: #222; color: white; width: 92%; max-width: 450px; padding: 50px 30px; border-radius: 40px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
         
-        .modal-content { background: #222; color: white; width: 95%; max-width: 800px; padding: 30px 15px; border-radius: 30px; text-align: center; }
+        .modal-input { width: 100%; padding: 25px; border-radius: 20px; border: none; margin-bottom: 30px; font-size: 32px; font-weight: 800; text-align: center; background: white; color: #120324; }
+        .modal-file-label { display: block; width: 100%; padding: 20px; background: #333; border: 2px dashed #555; border-radius: 15px; margin-bottom: 40px; color: #aaa; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .modal-main-btn { width: 100%; padding: 25px; background: #120324; color: white; border: 2px solid #333; border-radius: 20px; font-weight: 900; font-size: 32px; letter-spacing: 1px; }
+        .modal-cancel-btn { margin-top: 30px; color: #888; background: none; border: none; font-size: 18px; font-weight: bold; text-transform: uppercase; }
 
-        /* SPLIT REVIEW UI */
-        .review-split { display: flex; width: 100%; height: 60vh; gap: 15px; margin: 20px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; padding: 15px 0; }
-        .review-img-side { flex: 4; overflow: auto; background: #000; border-radius: 15px; display: flex; align-items: flex-start; justify-content: center; }
+        /* CHECKLIST & REVIEW */
+        .checklist-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f5f5; z-index: 500; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
+        .review-split { display: flex; width: 100%; height: 50vh; gap: 15px; margin: 20px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; padding: 15px 0; }
+        .review-img-side { flex: 1; overflow: auto; background: #000; border-radius: 15px; }
         .review-img-side img { width: 100%; height: auto; touch-action: pinch-zoom; }
-        .review-list-side { flex: 6; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
-        
+        .review-list-side { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .review-input-row { display: flex; gap: 8px; align-items: center; }
         .review-input-row input { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 18px; font-weight: bold; text-align: center; background: #444; color: white; }
         .review-input-row input.valid { background: var(--dmc-green); }
         .review-input-row input.invalid { background: var(--dmc-red); }
-        .del-row { background: none; border: none; color: #ff6b6b; font-size: 20px; padding: 0 5px; }
-        .add-row-btn { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 2px dashed #666; background: none; color: #aaa; font-weight: bold; }
-
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        #scanner-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; }
+        .camera-card { aspect-ratio: 1 / 1; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background: var(--dmc-purple); color: white; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(18, 3, 36, 0.1); grid-column: -1; }
     </style>
 </head>
 <body>
@@ -86,7 +86,7 @@
     <div class="project-grid" id="projectGrid"></div>
 </div>
 
-<div id="checklist-view" class="view-section">
+<div id="checklist-view" class="checklist-view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
         <h2 id="active-project-title" style="margin:0; font-size: 2rem;">Project</h2>
         <button onclick="closeChecklist()" style="border:none; background:#ddd; width:50px; height:50px; border-radius:50%; font-size:24px;">✕</button>
@@ -103,38 +103,40 @@
     </div>
 </div>
 
-<!-- MODAL: ADD PROJECT -->
+<!-- MODAL: ADD PROJECT (VERTICAL V6.8) -->
 <div id="add-project-modal" class="modal">
     <div class="modal-content">
-        <h3>New Project</h3>
-        <input type="text" id="new-proj-name" placeholder="Project Name" style="width:100%; padding:20px; border-radius:12px; margin-bottom:20px; font-size:20px;">
-        <input type="file" id="proj-image" accept="image/*" style="color:white; margin-bottom:25px; width:100%">
-        <div id="ocr-loading" style="display:none">
+        <h2 style="font-size: 2.4rem; margin-bottom: 40px;">New Project</h2>
+        
+        <input type="text" id="new-proj-name" class="modal-input" placeholder="Project Name">
+        
+        <label for="proj-image" class="modal-file-label" id="file-label">
+            TAP TO SELECT IMAGE
+        </label>
+        <input type="file" id="proj-image" accept="image/*" style="display:none" onchange="document.getElementById('file-label').innerText = this.files[0].name">
+
+        <div id="ocr-loading" style="display:none; margin-bottom: 30px;">
             <div class="spinner"></div>
-            <div style="font-size: 20px;">Reading Image...</div>
+            <div style="font-size: 20px; font-weight: bold;">Reading Image...</div>
         </div>
-        <button id="ocr-start-btn" onclick="processProjectImage()" style="width:100%; padding:20px; background:var(--dmc-purple); color:white; border:none; border-radius:12px; font-weight:bold; font-size:20px;">CONTINUE</button>
-        <button onclick="document.getElementById('add-project-modal').style.display='none'" style="margin-top:20px; color:#aaa; background:none; border:none; font-size:16px;">CANCEL</button>
+
+        <button id="ocr-start-btn" class="modal-main-btn" onclick="processProjectImage()">CONTINUE</button>
+        
+        <button class="modal-cancel-btn" onclick="document.getElementById('add-project-modal').style.display='none'">CANCEL</button>
     </div>
 </div>
 
-<!-- MODAL: ADVANCED REVIEW (V6.7) -->
 <div id="review-modal" class="modal">
     <div class="modal-content">
         <h3>Confirm Colors</h3>
         <div class="review-split">
-            <div class="review-img-side">
-                <img id="review-image-display" src="" alt="OCR Source">
-            </div>
-            <div class="review-list-side" id="review-list-side">
-                <!-- Inputs injected here -->
-            </div>
+            <div class="review-img-side"><img id="review-image-display" src="" alt="OCR Source"></div>
+            <div class="review-list-side" id="review-list-side"></div>
         </div>
         <button onclick="saveProject()" style="width:100%; padding:20px; background:var(--dmc-green); color:white; border:none; border-radius:15px; font-weight:bold; font-size:22px;">SAVE PROJECT</button>
     </div>
 </div>
 
-<!-- QUANTITY MODAL -->
 <div id="quantity-modal" class="modal" onclick="closeQuantitySheet()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div id="sheet-swatch" style="width:100px; height:100px; border-radius:20px; margin: 0 auto 25px; border:4px solid #444;"></div>
@@ -148,7 +150,12 @@
     </div>
 </div>
 
-<!-- Footer Nav -->
+<div id="scanner-container">
+    <div id="reader"></div>
+    <button onclick="toggleScanner()" style="width:90%; padding:25px; margin-top:25px; border:none; background:#fff; color:#000; border-radius:20px; font-weight:bold; font-size:22px;">CLOSE SCANNER</button>
+</div>
+
+<!-- FOOTER -->
 <div class="footer-bar">
     <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg> ALL</button>
     <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> OWNED</button>
@@ -159,53 +166,54 @@
 <script>
     let dmcData = {}, sortedKeys = [], myInventory = JSON.parse(localStorage.getItem('dmc_v5_quantities')) || {};
     let myProjects = JSON.parse(localStorage.getItem('dmc_projects')) || [];
+    let barcodeMap = JSON.parse(localStorage.getItem('dmc_barcodes_v4')) || {"077540050727":"208"};
     let onlyShowOwned = false, longPressTimer, touchStartPos = { x: 0, y: 0 }, currentSheetNum = null;
     let reviewList = [];
 
     async function loadColors() {
-        const response = await fetch('./colors.json?v=' + Date.now()); 
-        dmcData = await response.json();
-        sortedKeys = Object.keys(dmcData).sort((a, b) => {
-            const isANum = !isNaN(a); const isBNum = !isNaN(b);
-            if (isANum && isBNum) return parseInt(a) - parseInt(b);
-            if (isANum) return -1; if (isBNum) return 1;
-            return a.localeCompare(b);
-        });
-        renderList(); renderProjects();
+        try {
+            const response = await fetch('./colors.json?v=' + Date.now()); 
+            dmcData = await response.json();
+            sortedKeys = Object.keys(dmcData).sort((a, b) => {
+                const isANum = !isNaN(a); const isBNum = !isNaN(b);
+                if (isANum && isBNum) return parseInt(a) - parseInt(b);
+                if (isANum) return -1; if (isBNum) return 1;
+                return a.localeCompare(b);
+            });
+            renderList(); renderProjects();
+        } catch (e) { console.error("Error loading."); }
     }
 
-    function showTab(tab) {
+    function showTab(tabName) {
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        const activeBtn = document.getElementById(`tab-${tab}`);
+        const activeBtn = document.getElementById(`tab-${tabName}`);
         if (activeBtn) activeBtn.classList.add('active');
-        if (tab === 'all') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = false; renderList(); }
-        else if (tab === 'owned') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = true; renderList(); }
-        else { document.getElementById(`view-${tab}`).classList.add('active'); if (tab === 'projects') renderProjects(); }
+        if (tabName === 'all' || tabName === 'owned') { 
+            document.getElementById('view-library').classList.add('active'); 
+            onlyShowOwned = (tabName === 'owned'); 
+            renderList();
+        } else {
+            document.getElementById(`view-${tabName}`).classList.add('active');
+            if (tabName === 'projects') renderProjects();
+        }
     }
 
-    // --- ENHANCED OCR & REVIEW (V6.7) ---
     async function processProjectImage() {
         const fileInput = document.getElementById('proj-image');
         const nameInput = document.getElementById('new-proj-name');
-        if (!fileInput.files[0] || !nameInput.value) return alert("Enter name and select image");
-        
-        const file = fileInput.files[0];
+        if (!fileInput.files[0] || !nameInput.value) return alert("Select image and name");
         document.getElementById('ocr-loading').style.display = 'block';
         document.getElementById('ocr-start-btn').style.display = 'none';
-
-        // Prepare Image for Review View
+        const file = fileInput.files[0];
         document.getElementById('review-image-display').src = URL.createObjectURL(file);
-
         const worker = await Tesseract.createWorker();
         await worker.loadLanguage('eng'); await worker.initialize('eng');
         await worker.setParameters({ tessedit_char_whitelist: '0123456789' });
         const { data: { text } } = await worker.recognize(file);
         await worker.terminate();
-
         const codes = text.match(/\b\d{1,4}\b/g) || [];
         reviewList = [...new Set(codes)];
-        
         document.getElementById('ocr-loading').style.display = 'none';
         document.getElementById('ocr-start-btn').style.display = 'block';
         document.getElementById('add-project-modal').style.display = 'none';
@@ -217,74 +225,41 @@
         document.getElementById('review-modal').style.display = 'flex';
         const side = document.getElementById('review-list-side');
         side.innerHTML = '';
-        
         reviewList.forEach((code, idx) => {
-            const row = document.createElement('div');
-            row.className = 'review-input-row';
-            const isValid = dmcData[code.toUpperCase()];
-            
-            row.innerHTML = `
-                <input type="text" value="${code}" 
-                    class="${isValid ? 'valid' : 'invalid'}" 
-                    oninput="updateReviewItem(${idx}, this.value)"
-                    placeholder="####">
-                <button class="del-row" onclick="removeReviewItem(${idx})">✕</button>
-            `;
+            const row = document.createElement('div'); row.className = 'review-input-row';
+            const isValid = dmcData[code];
+            row.innerHTML = `<input type="text" value="${code}" class="${isValid?'valid':'invalid'}" oninput="updateReviewItem(${idx}, this.value)"><button onclick="removeReviewItem(${idx})" style="background:none;border:none;color:#ff6b6b;font-size:24px">✕</button>`;
             side.appendChild(row);
         });
-
         const addBtn = document.createElement('button');
-        addBtn.className = 'add-row-btn';
-        addBtn.innerText = "+ Add Color Manually";
+        addBtn.style.width='100%'; addBtn.style.padding='15px'; addBtn.style.borderRadius='12px'; addBtn.style.background='none'; addBtn.style.border='2px dashed #666'; addBtn.style.color='#aaa'; addBtn.innerText = "+ Add Color";
         addBtn.onclick = () => { reviewList.push(""); renderReviewList(); };
         side.appendChild(addBtn);
     }
 
-    function updateReviewItem(idx, val) {
-        reviewList[idx] = val.trim();
-        // Dynamic re-color logic
-        const input = document.querySelectorAll('.review-input-row input')[idx];
-        if (dmcData[val.toUpperCase()]) {
-            input.className = 'valid';
-        } else {
-            input.className = 'invalid';
-        }
+    function updateReviewItem(idx, val) { reviewList[idx] = val.trim(); renderReviewList(); }
+    function removeReviewItem(idx) { reviewList.splice(idx, 1); renderReviewList(); }
+    function saveProject() { const name = document.getElementById('new-proj-name').value; myProjects.push({ name, colors: reviewList.filter(c=>c!=="") }); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); document.getElementById('review-modal').style.display = 'none'; renderProjects(); }
+    
+    function renderProjects() {
+        const grid = document.getElementById('projectGrid');
+        grid.innerHTML = `<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`;
+        myProjects.forEach((p, idx) => {
+            const div = document.createElement('div'); div.className = 'project-card'; div.onclick = () => openChecklist(idx);
+            div.innerHTML = `<svg style="width:52px;height:52px;fill:#666;flex-shrink:0" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+                <span class="project-name">${p.name}</span><button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${idx})">✕</button>`;
+            grid.appendChild(div);
+        });
     }
 
-    function removeReviewItem(idx) {
-        reviewList.splice(idx, 1);
-        renderReviewList();
-    }
-
-    function saveProject() {
-        const finalCodes = reviewList.filter(c => c !== "").map(c => c.toUpperCase());
-        const name = document.getElementById('new-proj-name').value;
-        myProjects.push({ name, colors: finalCodes });
-        localStorage.setItem('dmc_projects', JSON.stringify(myProjects));
-        document.getElementById('review-modal').style.display = 'none';
-        document.getElementById('new-proj-name').value = '';
-        renderProjects();
-    }
-
-    // --- STANDARD APP LOGIC ---
     function openChecklist(idx) {
-        const p = myProjects[idx];
-        document.getElementById('checklist-view').style.display = 'block';
-        document.getElementById('active-project-title').innerText = p.name;
-        const container = document.getElementById('checklist-content');
-        container.innerHTML = '';
+        const p = myProjects[idx]; document.getElementById('checklist-view').style.display = 'block'; document.getElementById('active-project-title').innerText = p.name;
+        const container = document.getElementById('checklist-content'); container.innerHTML = '';
         p.colors.forEach(code => {
-            const qty = myInventory[code] || 0;
-            const isOwned = qty > 0;
-            const data = dmcData[code];
-            const card = document.createElement('div');
-            card.className = `check-card ${isOwned ? 'owned-border' : ''} ${!data ? 'unknown-color' : ''}`;
-            card.style.backgroundColor = data ? data.p : "#A6A6A6";
-            card.style.color = getContrastColor(data ? data.p : "#A6A6A6");
-            card.addEventListener('touchstart', (e) => {
-                const pos = e.touches[0]; touchStartPos = { x: pos.pageX, y: pos.pageY };
-                longPressTimer = setTimeout(() => { openQuantitySheet(code); if (navigator.vibrate) navigator.vibrate(50); }, 500);
-            }, { passive: true });
+            const qty = myInventory[code] || 0; const isOwned = qty > 0; const data = dmcData[code];
+            const card = document.createElement('div'); card.className = `check-card ${isOwned ? 'owned-border' : ''} ${!data ? 'unknown-color' : ''}`;
+            card.style.backgroundColor = data ? data.p : "#A6A6A6"; card.style.color = getContrastColor(data ? data.p : "#A6A6A6");
+            card.addEventListener('touchstart', (e) => { const pos = e.touches[0]; touchStartPos = { x: pos.pageX, y: pos.pageY }; longPressTimer = setTimeout(() => { openQuantitySheet(code); if (navigator.vibrate) navigator.vibrate(50); }, 500); }, { passive: true });
             card.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
             card.innerHTML = `<span class="color-num">${code}</span><div class="status-dot ${isOwned ? 'owned' : 'need'}">${isOwned ? '✓' : '✕'}</div>`;
             container.appendChild(card);
@@ -293,14 +268,10 @@
 
     function renderList() {
         const q = document.getElementById('searchInput').value.toLowerCase();
-        const container = document.getElementById('masterList');
-        container.innerHTML = ''; let count = 0;
+        const container = document.getElementById('masterList'); container.innerHTML = ''; let count = 0;
         sortedKeys.forEach(num => {
-            const qty = myInventory[num] || 0;
-            if (onlyShowOwned && qty === 0) return;
-            if (q && !num.toLowerCase().includes(q)) return;
-            const data = dmcData[num], card = document.createElement('div');
-            card.className = `color-card ${qty > 0 ? 'owned' : ''}`;
+            const qty = myInventory[num] || 0; if (onlyShowOwned && qty === 0) return; if (q && !num.toLowerCase().includes(q)) return;
+            const data = dmcData[num], card = document.createElement('div'); card.className = `color-card ${qty > 0 ? 'owned' : ''}`;
             card.style.backgroundColor = data.p; card.style.color = getContrastColor(data.p);
             card.addEventListener('touchstart', (e) => { const pos = e.touches[0]; touchStartPos = { x: pos.pageX, y: pos.pageY }; longPressTimer = setTimeout(() => { openQuantitySheet(num); if (navigator.vibrate) navigator.vibrate(50); }, 500); }, { passive: true });
             card.addEventListener('touchmove', (e) => { if (Math.sqrt(Math.pow(e.touches[0].pageX - touchStartPos.x, 2) + Math.pow(e.touches[0].pageY - touchStartPos.y, 2)) > 10) clearTimeout(longPressTimer); }, { passive: true });
@@ -309,35 +280,40 @@
             card.innerHTML = `<span class="color-num">${num}</span>` + (qty >= 1 ? `<div class="qty-badge">${qty}</div>` : '');
             container.appendChild(card); if(qty > 0) count++;
         });
+        if (!onlyShowOwned && !q) {
+            const cam = document.createElement('div'); cam.className = 'camera-card'; cam.onclick = toggleScanner;
+            cam.innerHTML = `<svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3Z"/></svg>`;
+            container.appendChild(cam);
+        }
         document.getElementById('ownedCount').innerText = count;
     }
 
-    function renderProjects() {
-        const grid = document.getElementById('projectGrid');
-        grid.innerHTML = `<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`;
-        myProjects.forEach((p, idx) => {
-            const div = document.createElement('div');
-            div.className = 'project-card';
-            div.onclick = () => openChecklist(idx);
-            div.innerHTML = `<svg style="width:52px;height:52px;fill:#666;flex-shrink:0" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-                <span class="project-name">${p.name}</span>
-                <button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${idx})">✕</button>`;
-            grid.appendChild(div);
-        });
-    }
-
-    function closeChecklist() { document.getElementById('checklist-view').style.display = 'none'; }
-    function deleteProject(idx) { if(confirm("Delete project?")) { myProjects.splice(idx, 1); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); renderProjects(); } }
-    function openQuantitySheet(num) { currentSheetNum = num; const data = dmcData[num.toUpperCase()]; document.getElementById('quantity-modal').style.display = 'flex'; document.getElementById('sheet-name').innerText = `DMC ${num}`; document.getElementById('sheet-full-name').innerText = data ? data.n : "Unknown Brand"; document.getElementById('sheet-swatch').style.backgroundColor = data ? data.p : "#A6A6A6"; updateSheetUI(); }
+    function openQuantitySheet(num) { currentSheetNum = num; const data = dmcData[num]; document.getElementById('quantity-modal').style.display = 'flex'; document.getElementById('sheet-name').innerText = `DMC ${num}`; document.getElementById('sheet-full-name').innerText = data ? data.n : "Unknown Brand"; document.getElementById('sheet-swatch').style.backgroundColor = data ? data.p : "#A6A6A6"; updateSheetUI(); }
     function closeQuantitySheet() { document.getElementById('quantity-modal').style.display = 'none'; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); if(document.getElementById('checklist-view').style.display === 'block') { const activeIdx = myProjects.findIndex(p => p.name === document.getElementById('active-project-title').innerText); if(activeIdx !== -1) openChecklist(activeIdx); } }
     function updateQty(delta) { myInventory[currentSheetNum] = Math.max(0, Math.min(50, (myInventory[currentSheetNum] || 0) + delta)); updateSheetUI(); }
     function updateSheetUI() { const q = myInventory[currentSheetNum] || 0; document.getElementById('sheet-qty').innerText = q; document.getElementById('minus-btn').disabled = (q <= 0); document.getElementById('plus-btn').disabled = (q >= 50); }
     function getContrastColor(hex) { const r = parseInt(hex.substr(1,2),16), g = parseInt(hex.substr(3,2),16), b = parseInt(hex.substr(5,2),16); return (((r*299)+(g*587)+(b*114))/1000 >= 128) ? 'black' : 'white'; }
+    function closeChecklist() { document.getElementById('checklist-view').style.display = 'none'; }
+    function deleteProject(idx) { if(confirm("Delete project?")) { myProjects.splice(idx, 1); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); renderProjects(); } }
     function exportData() { const blob = new Blob([JSON.stringify({ inventory: myInventory, projects: myProjects })], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Strings_Backup.json`; a.click(); }
     function importData(event) { const reader = new FileReader(); reader.onload = (e) => { const data = JSON.parse(e.target.result); myInventory = data.inventory || {}; myProjects = data.projects || []; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); location.reload(); }; reader.readAsText(event.target.files[0]); }
-    
+    let scannerActive = false, html5QrcodeScanner = null;
+    function toggleScanner() {
+        const c = document.getElementById('scanner-container'); scannerActive = !scannerActive;
+        c.style.display = scannerActive ? 'flex' : 'none';
+        if (scannerActive) {
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render((barcode) => {
+                let colorNum = barcodeMap[barcode];
+                if (!colorNum) {
+                    colorNum = prompt(`New Barcode: ${barcode}\nWhat DMC #?`);
+                    if (colorNum) { colorNum = colorNum.replace('*','').toUpperCase().trim(); barcodeMap[barcode] = colorNum; }
+                }
+                if (colorNum) { myInventory[colorNum] = (myInventory[colorNum] || 0) + 1; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); if (navigator.vibrate) navigator.vibrate(100); }
+            });
+        } else if (html5QrcodeScanner) { html5QrcodeScanner.clear(); }
+    }
     loadColors();
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 </script>
 </body>
 </html>
