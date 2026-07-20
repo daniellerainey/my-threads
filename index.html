@@ -130,4 +130,214 @@
                 <!-- Inputs injected here -->
             </div>
         </div>
-        <button onclick="saveProject()" style="width:100%; padding:20px; background:var(--dmc-green); color
+        <button onclick="saveProject()" style="width:100%; padding:20px; background:var(--dmc-green); color:white; border:none; border-radius:15px; font-weight:bold; font-size:22px;">SAVE PROJECT</button>
+    </div>
+</div>
+
+<!-- QUANTITY MODAL -->
+<div id="quantity-modal" class="modal" onclick="closeQuantitySheet()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div id="sheet-swatch" style="width:100px; height:100px; border-radius:20px; margin: 0 auto 25px; border:4px solid #444;"></div>
+        <div id="sheet-name" style="font-weight: bold; font-size:40px">DMC ---</div>
+        <div id="sheet-full-name" style="color: #aaa; font-size: 22px; margin-bottom: 10px;"></div>
+        <div class="stepper">
+            <button class="step-btn" id="minus-btn" onclick="updateQty(-1)">−</button>
+            <div id="sheet-qty" style="font-size:80px; font-weight:bold; min-width:100px;">0</div>
+            <button class="step-btn" id="plus-btn" onclick="updateQty(1)">+</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Nav -->
+<div class="footer-bar">
+    <button class="nav-btn active" onclick="showTab('all')" id="tab-all"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg> ALL</button>
+    <button class="nav-btn" onclick="showTab('owned')" id="tab-owned"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> OWNED</button>
+    <button class="nav-btn" onclick="showTab('projects')" id="tab-projects"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg> PROJECTS</button>
+    <button class="nav-btn" onclick="showTab('sync')" id="tab-sync"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 3V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm-6 8c0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6z"/></svg> SYNC</button>
+</div>
+
+<script>
+    let dmcData = {}, sortedKeys = [], myInventory = JSON.parse(localStorage.getItem('dmc_v5_quantities')) || {};
+    let myProjects = JSON.parse(localStorage.getItem('dmc_projects')) || [];
+    let onlyShowOwned = false, longPressTimer, touchStartPos = { x: 0, y: 0 }, currentSheetNum = null;
+    let reviewList = [];
+
+    async function loadColors() {
+        const response = await fetch('./colors.json?v=' + Date.now()); 
+        dmcData = await response.json();
+        sortedKeys = Object.keys(dmcData).sort((a, b) => {
+            const isANum = !isNaN(a); const isBNum = !isNaN(b);
+            if (isANum && isBNum) return parseInt(a) - parseInt(b);
+            if (isANum) return -1; if (isBNum) return 1;
+            return a.localeCompare(b);
+        });
+        renderList(); renderProjects();
+    }
+
+    function showTab(tab) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.getElementById(`tab-${tab}`);
+        if (activeBtn) activeBtn.classList.add('active');
+        if (tab === 'all') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = false; renderList(); }
+        else if (tab === 'owned') { document.getElementById('view-library').classList.add('active'); onlyShowOwned = true; renderList(); }
+        else { document.getElementById(`view-${tab}`).classList.add('active'); if (tab === 'projects') renderProjects(); }
+    }
+
+    // --- ENHANCED OCR & REVIEW (V6.7) ---
+    async function processProjectImage() {
+        const fileInput = document.getElementById('proj-image');
+        const nameInput = document.getElementById('new-proj-name');
+        if (!fileInput.files[0] || !nameInput.value) return alert("Enter name and select image");
+        
+        const file = fileInput.files[0];
+        document.getElementById('ocr-loading').style.display = 'block';
+        document.getElementById('ocr-start-btn').style.display = 'none';
+
+        // Prepare Image for Review View
+        document.getElementById('review-image-display').src = URL.createObjectURL(file);
+
+        const worker = await Tesseract.createWorker();
+        await worker.loadLanguage('eng'); await worker.initialize('eng');
+        await worker.setParameters({ tessedit_char_whitelist: '0123456789' });
+        const { data: { text } } = await worker.recognize(file);
+        await worker.terminate();
+
+        const codes = text.match(/\b\d{1,4}\b/g) || [];
+        reviewList = [...new Set(codes)];
+        
+        document.getElementById('ocr-loading').style.display = 'none';
+        document.getElementById('ocr-start-btn').style.display = 'block';
+        document.getElementById('add-project-modal').style.display = 'none';
+        if (navigator.vibrate) navigator.vibrate(200);
+        renderReviewList();
+    }
+
+    function renderReviewList() {
+        document.getElementById('review-modal').style.display = 'flex';
+        const side = document.getElementById('review-list-side');
+        side.innerHTML = '';
+        
+        reviewList.forEach((code, idx) => {
+            const row = document.createElement('div');
+            row.className = 'review-input-row';
+            const isValid = dmcData[code.toUpperCase()];
+            
+            row.innerHTML = `
+                <input type="text" value="${code}" 
+                    class="${isValid ? 'valid' : 'invalid'}" 
+                    oninput="updateReviewItem(${idx}, this.value)"
+                    placeholder="####">
+                <button class="del-row" onclick="removeReviewItem(${idx})">✕</button>
+            `;
+            side.appendChild(row);
+        });
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'add-row-btn';
+        addBtn.innerText = "+ Add Color Manually";
+        addBtn.onclick = () => { reviewList.push(""); renderReviewList(); };
+        side.appendChild(addBtn);
+    }
+
+    function updateReviewItem(idx, val) {
+        reviewList[idx] = val.trim();
+        // Dynamic re-color logic
+        const input = document.querySelectorAll('.review-input-row input')[idx];
+        if (dmcData[val.toUpperCase()]) {
+            input.className = 'valid';
+        } else {
+            input.className = 'invalid';
+        }
+    }
+
+    function removeReviewItem(idx) {
+        reviewList.splice(idx, 1);
+        renderReviewList();
+    }
+
+    function saveProject() {
+        const finalCodes = reviewList.filter(c => c !== "").map(c => c.toUpperCase());
+        const name = document.getElementById('new-proj-name').value;
+        myProjects.push({ name, colors: finalCodes });
+        localStorage.setItem('dmc_projects', JSON.stringify(myProjects));
+        document.getElementById('review-modal').style.display = 'none';
+        document.getElementById('new-proj-name').value = '';
+        renderProjects();
+    }
+
+    // --- STANDARD APP LOGIC ---
+    function openChecklist(idx) {
+        const p = myProjects[idx];
+        document.getElementById('checklist-view').style.display = 'block';
+        document.getElementById('active-project-title').innerText = p.name;
+        const container = document.getElementById('checklist-content');
+        container.innerHTML = '';
+        p.colors.forEach(code => {
+            const qty = myInventory[code] || 0;
+            const isOwned = qty > 0;
+            const data = dmcData[code];
+            const card = document.createElement('div');
+            card.className = `check-card ${isOwned ? 'owned-border' : ''} ${!data ? 'unknown-color' : ''}`;
+            card.style.backgroundColor = data ? data.p : "#A6A6A6";
+            card.style.color = getContrastColor(data ? data.p : "#A6A6A6");
+            card.addEventListener('touchstart', (e) => {
+                const pos = e.touches[0]; touchStartPos = { x: pos.pageX, y: pos.pageY };
+                longPressTimer = setTimeout(() => { openQuantitySheet(code); if (navigator.vibrate) navigator.vibrate(50); }, 500);
+            }, { passive: true });
+            card.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
+            card.innerHTML = `<span class="color-num">${code}</span><div class="status-dot ${isOwned ? 'owned' : 'need'}">${isOwned ? '✓' : '✕'}</div>`;
+            container.appendChild(card);
+        });
+    }
+
+    function renderList() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const container = document.getElementById('masterList');
+        container.innerHTML = ''; let count = 0;
+        sortedKeys.forEach(num => {
+            const qty = myInventory[num] || 0;
+            if (onlyShowOwned && qty === 0) return;
+            if (q && !num.toLowerCase().includes(q)) return;
+            const data = dmcData[num], card = document.createElement('div');
+            card.className = `color-card ${qty > 0 ? 'owned' : ''}`;
+            card.style.backgroundColor = data.p; card.style.color = getContrastColor(data.p);
+            card.addEventListener('touchstart', (e) => { const pos = e.touches[0]; touchStartPos = { x: pos.pageX, y: pos.pageY }; longPressTimer = setTimeout(() => { openQuantitySheet(num); if (navigator.vibrate) navigator.vibrate(50); }, 500); }, { passive: true });
+            card.addEventListener('touchmove', (e) => { if (Math.sqrt(Math.pow(e.touches[0].pageX - touchStartPos.x, 2) + Math.pow(e.touches[0].pageY - touchStartPos.y, 2)) > 10) clearTimeout(longPressTimer); }, { passive: true });
+            card.addEventListener('touchend', () => clearTimeout(longPressTimer), { passive: true });
+            card.oncontextmenu = (e) => e.preventDefault();
+            card.innerHTML = `<span class="color-num">${num}</span>` + (qty >= 1 ? `<div class="qty-badge">${qty}</div>` : '');
+            container.appendChild(card); if(qty > 0) count++;
+        });
+        document.getElementById('ownedCount').innerText = count;
+    }
+
+    function renderProjects() {
+        const grid = document.getElementById('projectGrid');
+        grid.innerHTML = `<div class="project-card new-btn" onclick="document.getElementById('add-project-modal').style.display='flex'"><div class="new-btn-text">+ new project</div></div>`;
+        myProjects.forEach((p, idx) => {
+            const div = document.createElement('div');
+            div.className = 'project-card';
+            div.onclick = () => openChecklist(idx);
+            div.innerHTML = `<svg style="width:52px;height:52px;fill:#666;flex-shrink:0" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+                <span class="project-name">${p.name}</span>
+                <button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${idx})">✕</button>`;
+            grid.appendChild(div);
+        });
+    }
+
+    function closeChecklist() { document.getElementById('checklist-view').style.display = 'none'; }
+    function deleteProject(idx) { if(confirm("Delete project?")) { myProjects.splice(idx, 1); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); renderProjects(); } }
+    function openQuantitySheet(num) { currentSheetNum = num; const data = dmcData[num.toUpperCase()]; document.getElementById('quantity-modal').style.display = 'flex'; document.getElementById('sheet-name').innerText = `DMC ${num}`; document.getElementById('sheet-full-name').innerText = data ? data.n : "Unknown Brand"; document.getElementById('sheet-swatch').style.backgroundColor = data ? data.p : "#A6A6A6"; updateSheetUI(); }
+    function closeQuantitySheet() { document.getElementById('quantity-modal').style.display = 'none'; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); renderList(); if(document.getElementById('checklist-view').style.display === 'block') { const activeIdx = myProjects.findIndex(p => p.name === document.getElementById('active-project-title').innerText); if(activeIdx !== -1) openChecklist(activeIdx); } }
+    function updateQty(delta) { myInventory[currentSheetNum] = Math.max(0, Math.min(50, (myInventory[currentSheetNum] || 0) + delta)); updateSheetUI(); }
+    function updateSheetUI() { const q = myInventory[currentSheetNum] || 0; document.getElementById('sheet-qty').innerText = q; document.getElementById('minus-btn').disabled = (q <= 0); document.getElementById('plus-btn').disabled = (q >= 50); }
+    function getContrastColor(hex) { const r = parseInt(hex.substr(1,2),16), g = parseInt(hex.substr(3,2),16), b = parseInt(hex.substr(5,2),16); return (((r*299)+(g*587)+(b*114))/1000 >= 128) ? 'black' : 'white'; }
+    function exportData() { const blob = new Blob([JSON.stringify({ inventory: myInventory, projects: myProjects })], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Strings_Backup.json`; a.click(); }
+    function importData(event) { const reader = new FileReader(); reader.onload = (e) => { const data = JSON.parse(e.target.result); myInventory = data.inventory || {}; myProjects = data.projects || []; localStorage.setItem('dmc_v5_quantities', JSON.stringify(myInventory)); localStorage.setItem('dmc_projects', JSON.stringify(myProjects)); location.reload(); }; reader.readAsText(event.target.files[0]); }
+    
+    loadColors();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
